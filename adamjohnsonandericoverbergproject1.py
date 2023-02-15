@@ -64,7 +64,7 @@ def steering_seek(self, target):
     return result
 
 
-def steeringflee(self, target):
+def steering_flee(self, target):
     # Flee;  move directly away from target as fast as possible.
     result = character()
     self.linear = self.position - target.position
