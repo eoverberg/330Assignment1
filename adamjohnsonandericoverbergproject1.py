@@ -4,7 +4,9 @@
 # initialize steering behavior
 
 #TODO::
-# Implement plotting
+# Implement plotting (given by prof)
+# Implement the loop to update the values
+# Continue movement function (take in movements and return the same value)
 import math
 import numpy as np
 
@@ -57,8 +59,8 @@ def GetSteeringContinue(self):
 def GetSteeringSeek(self, target):
     # Seek; move directly towards target as fast as possible.
     result = Character(self.position, self.linear, self.angular)
-    self.linear = target.position - self.position
-    self.linear = np.linalg.norm(self.linear)
+    self.linear = target.position - self.position # gets direction to move based on target's position
+    self.linear = np.linalg.norm(self.linear) # normalizes the vector
     self.linear *= self.max_linear
     self.angular = 0
     return result
@@ -67,8 +69,8 @@ def GetSteeringSeek(self, target):
 def GetSteeringFlee(self, target):
     # Flee;  move directly away from target as fast as possible.
     result = Character()
-    self.linear = self.position - target.position
-    self.linear = np.linalg.norm(self.linear)
+    self.linear = self.position - target.position # calculates direction in which to flee
+    self.linear = np.linalg.norm(self.linear) # normalizes the vector
     self.linear *= self.max_linear
     self.angular = 0
     return result
@@ -79,22 +81,22 @@ def GetSteeringArrive(self, target):
     result = Character()
     direction = target.position - self.position
     distance = np.linalg.norm(direction)
-    if distance < self.arrive_radius:
+    if distance < self.arrive_radius: # slow down when in range
         arrive_speed = 0
-    elif distance > self.arrive_radius:
+    elif distance > self.arrive_radius: # set speed to max otherwise
         arrive_speed = self.max_velocity
     else:
         arrive_speed = self.max_velocity * distance / self.arrive_radius
     arrive_velocity = np.linalg.norm(direction) * arrive_speed
     result.linear = arrive_velocity - self.velocity
     result.linear = result.linear / self.arrive_time
-    if np.linalg.norm(result.linear) > self.max_linear:
+    if np.linalg.norm(result.linear) > self.max_linear: # resets the vector
         result.linear = np.linalg.norm(result.linear)
         result.linear = result.linear * self.max_linear
     return result
 
 
-def DynamicUpdate(self, steering, max_speed, time):
+def DynamicUpdate(self, steering, max_speed, time): # This is the movement update function on the rubric
     # Update Position and orienatation
     self.position += self.velocity * time
     self.orientation += self.rotation * time
@@ -121,7 +123,8 @@ def main():
 
     delta_time = 0.50
     time_stop = 50
+    steps_total = time_stop / delta_time
 
-    with open("trajectoryfile", "w") as f:
+    with open("trajectoryfile", "w") as f: # creates a file and writes in all trajectory data
         for i, char in enumerate(characters):
             char_out = "0,{},{},{},{},{},{},{},{},{},{}\n".format(char.id, )
