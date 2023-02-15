@@ -10,11 +10,11 @@ import numpy as np
 
 
 # calculate length of 2D vector
-def vector_Length(v):
+def vector_length(v):
     return (math.sqrt(v[0] ** 2 + v[1] ** 2))
 
 
-class Character:
+class character:
     CONTINUE = 1
     FLEE = 6
     SEEK = 7
@@ -48,13 +48,13 @@ class Character:
 # Define steering behaviors
 
 
-def GetSteeringContinue(self):
+def steering_continue(self):
     # Continue moving without changing direction
     result = {"linear": self.linear, "angular": self.angular}
     return result
 
 
-def GetSteeringSeek(self, target):
+def steering_seek(self, target):
     # Seek; move directly towards target as fast as possible.
     result = Character(self.position, self.linear, self.angular)
     self.linear = target.position - self.position
@@ -64,7 +64,7 @@ def GetSteeringSeek(self, target):
     return result
 
 
-def GetSteeringFlee(self, target):
+def steeringflee(self, target):
     # Flee;  move directly away from target as fast as possible.
     result = Character()
     self.linear = self.position - target.position
@@ -74,7 +74,7 @@ def GetSteeringFlee(self, target):
     return result
 
 
-def GetSteeringArrive(self, target):
+def steering_arrive(self, target):
     # Arrive; move directly towards target, slowing down when near.
     result = Character()
     direction = target.position - self.position
@@ -94,7 +94,7 @@ def GetSteeringArrive(self, target):
     return result
 
 
-def DynamicUpdate(self, steering, max_speed, time):
+def dynamic_update(self, steering, max_speed, time):
     # Update Position and orienatation
     self.position += self.velocity * time
     self.orientation += self.rotation * time
