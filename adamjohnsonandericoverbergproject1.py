@@ -12,11 +12,11 @@ import numpy as np
 
 
 # calculate length of 2D vector
-def vector_Length(v):
+def vector_length(v):
     return (math.sqrt(v[0] ** 2 + v[1] ** 2))
 
 
-class Character:
+class character:
     CONTINUE = 1
     FLEE = 6
     SEEK = 7
@@ -50,25 +50,28 @@ class Character:
 # Define steering behaviors
 
 
-def GetSteeringContinue(self):
+def steering_continue(self):
     # Continue moving without changing direction
     result = {"linear": self.linear, "angular": self.angular}
     return result
 
 
-def GetSteeringSeek(self, target):
+def steering_seek(self, target):
     # Seek; move directly towards target as fast as possible.
     result = Character(self.position, self.linear, self.angular)
     self.linear = target.position - self.position # gets direction to move based on target's position
     self.linear = np.linalg.norm(self.linear) # normalizes the vector
+    result = character(self.position, self.linear, self.angular)
+    self.linear = target.position - self.position
+    self.linear = np.linalg.norm(self.linear)
     self.linear *= self.max_linear
     self.angular = 0
     return result
 
 
-def GetSteeringFlee(self, target):
+def steering_flee(self, target):
     # Flee;  move directly away from target as fast as possible.
-    result = Character()
+    result = character()
     self.linear = self.position - target.position # calculates direction in which to flee
     self.linear = np.linalg.norm(self.linear) # normalizes the vector
     self.linear *= self.max_linear
@@ -76,7 +79,7 @@ def GetSteeringFlee(self, target):
     return result
 
 
-def GetSteeringArrive(self, target):
+def steering_arrive(self, target):
     # Arrive; move directly towards target, slowing down when near.
     result = Character()
     direction = target.position - self.position
@@ -96,7 +99,7 @@ def GetSteeringArrive(self, target):
     return result
 
 
-def DynamicUpdate(self, steering, max_speed, time): # This is the movement update function on the rubric
+def dynamic_update(self, steering, max_speed, time): # This is the movement update function on the rubric
     # Update Position and orienatation
     self.position += self.velocity * time
     self.orientation += self.rotation * time
@@ -111,12 +114,12 @@ def DynamicUpdate(self, steering, max_speed, time): # This is the movement updat
 
 
 def main():
-    character1 = Character(id=2601, steer=1)
-    character2 = Character(id=2502, steer=2, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 2, rotation=8,
+    character1 = character(id=2601, steer=1)
+    character2 = character(id=2502, steer=2, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 2, rotation=8,
                            max_linear=2, target=1)
-    character3 = Character(id=2503, steer=3, position=[-50, 40], velocity=[0, 8], orientation=math.pi / 2, rotation=8,
+    character3 = character(id=2503, steer=3, position=[-50, 40], velocity=[0, 8], orientation=math.pi / 2, rotation=8,
                            max_linear=2, target=1)
-    character4 = Character(id=2504, steer=4, position=[50, 75], velocity=[-9, 4], orientation=math.pi / 2, rotation=8,
+    character4 = character(id=2504, steer=4, position=[50, 75], velocity=[-9, 4], orientation=math.pi / 2, rotation=8,
                            max_linear=2, target=1)
 
     characters = [character1, character2, character3, character4]
