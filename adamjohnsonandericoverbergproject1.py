@@ -3,24 +3,23 @@
 # Program: Assignment 1
 # initialize steering behavior
 
-#TODO::
-# Implement plotting (given by prof)
+# TODO::
 # Implement the loop to update the values
 # Continue movement function (take in movements and return the same value)
 import math
 import numpy as np
 
-
+CONTINUE = 1
+FLEE = 6
+SEEK = 7
+ARRIVE = 8
 # calculate length of 2D vector
 def vector_length(v):
     return (math.sqrt(v[0] ** 2 + v[1] ** 2))
 
 
 class character:
-    CONTINUE = 1
-    FLEE = 6
-    SEEK = 7
-    ARRIVE = 8
+
 
     # Initialize general movement
     def __init__(self, id: str = None, steer: int = 0, position: np.array = ([0, 0]), velocity: np.array = ([0, 0]),
@@ -52,15 +51,15 @@ class character:
 
 def steering_continue(self):
     # Continue moving without changing direction
-    result = character(self.linear, "angular": self.angular)
+    result = character(self.linear, self.angular)
     return result
 
 
-def steering_seek(self, target):
+def steering_seek(self, target):  # steering d = 2
     # Seek; move directly towards target as fast as possible.
     result = character(self.position, self.linear, self.angular)
-    self.linear = target.position - self.position # gets direction to move based on target's position
-    self.linear = np.linalg.norm(self.linear) # normalizes the vector
+    self.linear = target.position - self.position  # gets direction to move based on target's position
+    self.linear = np.linalg.norm(self.linear)  # normalizes the vector
     result = character(self.position, self.linear, self.angular)
     self.linear = target.position - self.position
     self.linear = np.linalg.norm(self.linear)
@@ -69,65 +68,92 @@ def steering_seek(self, target):
     return result
 
 
-def steering_flee(self, target):
+def steering_flee(self, target):  # steering id = 3
     # Flee;  move directly away from target as fast as possible.
     result = character(self.position, self.linear, self.arngular, self.max_linear)
-    self.linear = self.position - target.position # calculates direction in which to flee
-    self.linear = np.linalg.norm(self.linear) # normalizes the vector
+    self.linear = self.position - target.position  # calculates direction in which to flee
+    self.linear = np.linalg.norm(self.linear)  # normalizes the vector
     self.linear *= self.max_linear
     self.angular = 0
     return result
 
 
-def steering_arrive(self, target):
+def steering_arrive(self, target):  # steering id = 4
     # Arrive; move directly towards target, slowing down when near.
     result = character(self.position, self.arrive_radius, self.max_velocity, self.linear, self.max_linear, self.arrive_time)
     direction = target.position - self.position
     distance = np.linalg.norm(direction)
-    if distance < self.arrive_radius: # slow down when in range
+    if distance < self.arrive_radius:  # slow down when in range
         arrive_speed = 0
-    elif distance > self.arrive_radius: # set speed to max otherwise
+    elif distance > self.arrive_radius:  # set speed to max otherwise
         arrive_speed = self.max_velocity
     else:
         arrive_speed = self.max_velocity * distance / self.arrive_radius
     arrive_velocity = np.linalg.norm(direction) * arrive_speed
     result.linear = arrive_velocity - self.velocity
     result.linear = result.linear / self.arrive_time
-    if np.linalg.norm(result.linear) > self.max_linear: # resets the vector
+    if np.linalg.norm(result.linear) > self.max_linear:  # resets the vector
         result.linear = np.linalg.norm(result.linear)
         result.linear = result.linear * self.max_linear
     return result
 
 
-def dynamic_update(self, steering, max_speed, time): # This is the movement update function on the rubric
-    # Update Position and orienatation
-    self.position += self.velocity * time
-    self.orientation += self.rotation * time
+def dynamic_update(self, steering, time):  # This is the movement update function on the rubric
+    # Update Position and orientation
+    self.position = self.velocity * time + self.position
+    self.orientation = self.rotation * time + self.orientation
     # Update Velocity and rotation
-    self.velocity += self.linear * time
-    self.rotation += steering.linear * time
-    self.rotation += steering.angular * time
-    # Check for speed and clip
-    speed = np.linalg.norm(self.velocity)
-    if speed > max_speed:
-        self.velocity = self.velocity / speed * max_speed
+    self.velocity = self.linear * time + self.velocity
+    self.rotation = steering.linear * time + self.rotation
+    self.rotation = steering.angular * time + self.rotation
+    return self
 
 
 def main():
-    character1 = character(id=2601, steer=1)
-    character2 = character(id=2502, steer=2, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 2, rotation=8,
+    character1 = character(id="2601", steer=1)
+    character2 = character(id="2502", steer=2, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 2, rotation=8,
                            max_linear=2, target=1)
-    character3 = character(id=2503, steer=3, position=[-50, 40], velocity=[0, 8], orientation=math.pi / 2, rotation=8,
+    character3 = character(id="2503", steer=3, position=[-50, 40], velocity=[0, 8], orientation=math.pi / 2, rotation=8,
                            max_linear=2, target=1)
-    character4 = character(id=2504, steer=4, position=[50, 75], velocity=[-9, 4], orientation=math.pi / 2, rotation=8,
+    character4 = character(id="2504", steer=4, position=[50, 75], velocity=[-9, 4], orientation=math.pi / 2, rotation=8,
                            max_linear=2, target=1)
 
     characters = [character1, character2, character3, character4]
-
+    time = 0
     delta_time = 0.50
     time_stop = 50
-    steps_total = time_stop / delta_time
+    with open("trajectoryfile.txt", "w") as f:  # creates a file and writes in all trajectory data
+        while time <= time_stop:
+            for i in range(len(characters)):
+                if characters[i].steer == CONTINUE:
+                    steering = steering_continue(characters[i])
+                elif characters[i].steer == SEEK:
+                    steering = steering_seek(characters[i], character1)
+                elif characters[i].steer == FLEE:
+                    steering = steering_flee(characters[i], character1)
+                elif characters[i].steer == ARRIVE:
+                    steering = steering_arrive(characters[i], character1)
+                characters[i] = dynamic_update(characters[i], steering, time)
+                f.write(str(characters[i].id))
+                f.write(", ")
+                f.write(str(characters[i].position[1]))
+                f.write(", ")
+                f.write(str(characters[i].position[2]))
+                f.write(", ")
+                f.write(str(characters[i].velocity[1]))
+                f.write(", ")
+                f.write(str(characters[i].velocity[2]))
+                f.write(", ")
+                f.write(str(characters[i].linear[1]))
+                f.write(", ")
+                f.write(str(characters[i].linear[2]))
+                f.write(", ")
+                f.write(str(characters[i].orientation))
+                f.write(", ")
+                f.write(str(characters[i].steer))
 
-    with open("trajectoryfile", "w") as f: # creates a file and writes in all trajectory data
-        for i, char in enumerate(characters):
-            char_out = "0,{},{},{},{},{},{},{},{},{},{}\n".format(char.id, )
+
+
+
+if __name__ == main():
+    main()
