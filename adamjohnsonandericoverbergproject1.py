@@ -104,12 +104,14 @@ def steering_arrive(self, target):  # steering id = 4
 
 def dynamic_update(self, steering, time):  # This is the movement update function on the rubric
     # Update Position and orientation
-    self.position = self.velocity * time + self.position
-    self.orientation = self.rotation * time + self.orientation
+    self.position[0] = self.position[0] + (self.velocity[0] * time)
+    self.position[1] = self.position[1] + (self.velocity[1] * time)
+    self.orientation = self.orientation + (self.rotation * time)
     # Update Velocity and rotation
-    self.velocity = self.linear * time + self.velocity
-    self.rotation = steering.linear * time + self.rotation
-    self.rotation = steering.angular * time + self.rotation
+    self.velocity[0] = self.velocity[0] + (self.linear[0] * time)
+    self.velocity[1] = self.velocity[1] + (self.linear[1] * time)
+#    self.rotation = steering.linear * time + self.rotation
+    self.rotation = self.rotation + (steering.angular * time)
     return self
 
 
@@ -140,21 +142,22 @@ def main():
                 characters[i] = dynamic_update(characters[i], steering, time)
                 f.write(str(characters[i].id))
                 f.write(", ")
+                f.write(str(characters[i].position[0]))
+                f.write(", ")
                 f.write(str(characters[i].position[1]))
                 f.write(", ")
-                f.write(str(characters[i].position[2]))
+                f.write(str(characters[i].velocity[0]))
                 f.write(", ")
                 f.write(str(characters[i].velocity[1]))
                 f.write(", ")
-                f.write(str(characters[i].velocity[2]))
+                f.write(str(characters[i].linear[0]))
                 f.write(", ")
                 f.write(str(characters[i].linear[1]))
-                f.write(", ")
-                f.write(str(characters[i].linear[2]))
                 f.write(", ")
                 f.write(str(characters[i].orientation))
                 f.write(", ")
                 f.write(str(characters[i].steer))
+                time = time + delta_time
 
 
 
