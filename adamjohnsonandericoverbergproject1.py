@@ -51,13 +51,15 @@ class character:
 
 def steering_continue(self):
     # Continue moving without changing direction
-    result = character(self.linear, self.angular)
+    result = character(linear=self.linear, angular=self.angular)
     return result
 
 
-def steering_seek(self, target):  # steering d = 2
+def steering_seek(self, target):  # steering ds = 2
     # Seek; move directly towards target as fast as possible.
-    result = character(self.position, self.linear, self.angular)
+    result = character(self.id, self.steer, self.position, self.velocity, self.linear, self.orientation,
+                       self.rotation, self.angular, self.max_velocity, self.max_linear, self.target,
+                       self.arrive_radius, self.arrive_slow, self.arrive_time)
     self.linear = target.position - self.position  # gets direction to move based on target's position
     self.linear = np.linalg.norm(self.linear)  # normalizes the vector
     result = character(self.position, self.linear, self.angular)
@@ -70,7 +72,9 @@ def steering_seek(self, target):  # steering d = 2
 
 def steering_flee(self, target):  # steering id = 3
     # Flee;  move directly away from target as fast as possible.
-    result = character(self.position, self.linear, self.arngular, self.max_linear)
+    result = character(self.id, self.steer, self.position, self.velocity, self.linear, self.orientation,
+                       self.rotation, self.angular, self.max_velocity, self.max_linear, self.target,
+                       self.arrive_radius, self.arrive_slow, self.arrive_time)
     self.linear = self.position - target.position  # calculates direction in which to flee
     self.linear = np.linalg.norm(self.linear)  # normalizes the vector
     self.linear *= self.max_linear
