@@ -61,30 +61,29 @@ def steering_continue(character):
     return result
 
 
-def steering_seek(self, target):  # steering ds = 2
+def steering_seek(mover, target):  # steering ds = 2
     # Seek; move directly towards target as fast as possible.
-    result = character(self.id, self.steer, self.position, self.velocity, self.linear, self.orientation,
-                       self.rotation, self.angular, self.max_velocity, self.max_linear, self.target,
-                       self.arrive_radius, self.arrive_slow, self.arrive_time)
-    self.linear = target.position - self.position  # gets direction to move based on target's position
-    self.linear = np.linalg.norm(self.linear)  # normalizes the vector
-    result = character(self.position, self.linear, self.angular)
-    self.linear = target.position - self.position
-    self.linear = np.linalg.norm(self.linear)
-    self.linear *= self.max_linear
-    self.angular = 0
+    result = steering_output()
+    # Get the direction to the target.
+    result.linear = target.position - mover.position 
+    
+    # Give full acceleration along this direction.
+    result.linear = np.linalg.norm(result.linear)  # normalizes the vector
+    result.linear = result.linear * mover.max_linear
+    result.angular = 0
     return result
 
 #
-def steering_flee(self, target):  # steering id = 3
+def steering_flee(mover, target):  # steering id = 3
     # Flee;  move directly away from target as fast as possible.
-    result = character(self.id, self.steer, self.position, self.velocity, self.linear, self.orientation,
-                       self.rotation, self.angular, self.max_velocity, self.max_linear, self.target,
-                       self.arrive_radius, self.arrive_slow, self.arrive_time)
-    self.linear = self.position - target.position  # calculates direction in which to flee
-    self.linear = np.linalg.norm(self.linear)  # normalizes the vector
-    self.linear *= self.max_linear
-    self.angular = 0
+    result = steering_output()
+    # Get the direction to the target.
+    result.linear = mover.position - target.position  # gets direction to move based on target's position
+    
+    # Give full acceleration along this direction.
+    result.linear = np.linalg.norm(result.linear)  # normalizes the vector
+    result.linear = result.linear * mover.max_linear
+    result.angular = 0
     return result
 
 
