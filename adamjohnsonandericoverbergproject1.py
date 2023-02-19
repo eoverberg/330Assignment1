@@ -7,15 +7,23 @@
 # Implement the loop to update the values
 # Continue movement function (take in movements and return the same value)
 import math
-import numpy as np
+
 
 CONTINUE = 1
 FLEE = 6
 SEEK = 7
 ARRIVE = 8
 # calculate length of 2D vector
-def vector_length(v):
-    return (math.sqrt(v[0] ** 2 + v[1] ** 2))
+def vector_length(vector):
+    return (math.sqrt(vector[0] ** 2 + vector[1] ** 2))
+#normalize vector
+def normalize(vector)
+    vector_length = length(vector)
+    if vector_length == 0:
+        return vector
+    result = np.array([vector[0]/vector_length, vector[1]/vector_length)
+    return result
+        
 
 
 class character:
@@ -36,13 +44,14 @@ class character:
         self.max_velocity = max_velocity
         self.max_linear = max_linear
         self.target = target
+        self.target_radius = target_radius
         self.arrive_radius = arrive_radius
         self.arrive_slow = arrive_slow
         self.arrive_time = arrive_time
         
 class steering_output:
-    def __init__(self):
-        self.linear = np.array([0.0, 0.0])
+    def __init__(self, linear: List[float)= [0,0], angular = 0):
+        self.linear = linear
         self.angular = angular
 
 
@@ -60,7 +69,7 @@ def steering_continue(character):
     result.angular = character.angular
     return result
 
-
+#note: mover is the character
 def steering_seek(mover, target):  # steering ds = 2
     # Seek; move directly towards target as fast as possible.
     result = steering_output()
@@ -68,7 +77,7 @@ def steering_seek(mover, target):  # steering ds = 2
     result.linear = target.position - mover.position 
     
     # Give full acceleration along this direction.
-    result.linear = np.linalg.norm(result.linear)  # normalizes the vector
+    result.linear = normalize(result.linear)  # normalizes the vector
     result.linear = result.linear * mover.max_linear
     result.angular = 0
     return result
@@ -81,23 +90,29 @@ def steering_flee(mover, target):  # steering id = 3
     result.linear = mover.position - target.position  # gets direction to move based on target's position
     
     # Give full acceleration along this direction.
-    result.linear = np.linalg.norm(result.linear)  # normalizes the vector
+    result.linear = normalize(result.linear)  # normalizes the vector
     result.linear = result.linear * mover.max_linear
     result.angular = 0
     return result
 
 
-def steering_arrive(self, target):  # steering id = 4
+def steering_arrive(mover, target):  # steering id = 4 
     # Arrive; move directly towards target, slowing down when near.
-    result = character(self.position, self.arrive_radius, self.max_velocity, self.linear, self.max_linear, self.arrive_time)
-    direction = target.position - self.position
-    distance = np.linalg.norm(direction)
-    if distance < self.arrive_radius:  # slow down when in range
+    result = steering_output()
+    # Get the direction to the target.                             
+    direction = target.position - mover.position 
+    distance = normalize(direction)
+    # check if we are, return no steering
+    if distance < target_radius
+        return null
+    # If we are outside the slowRadius, then move at max speed.
+    if distance < mover.arrive_radius:  # slow down when in range
         arrive_speed = 0
-    elif distance > self.arrive_radius:  # set speed to max otherwise
-        arrive_speed = self.max_velocity
+    elif distance > mover.arrive_slow:  # set speed to max otherwise
+        arrive_speed = mover.max_velocity
     else:
-        arrive_speed = self.max_velocity * distance / self.arrive_radius
+        arrive_speed = mover.max_velocity * distance / mover.arrive_slow
+    #The target velocity combines speed and direction
     arrive_velocity = np.linalg.norm(direction) * arrive_speed
     result.linear = arrive_velocity - self.velocity
     result.linear = result.linear / self.arrive_time
