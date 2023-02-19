@@ -157,6 +157,7 @@ def main():
                 f.write(str(characters[i].orientation))
                 f.write(", ")
                 f.write(str(characters[i].steer))
+                f.write("\n")
                 time = time + delta_time
 
 
