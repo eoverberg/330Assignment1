@@ -19,8 +19,6 @@ def vector_length(v):
 
 
 class character:
-
-
     # Initialize general movement
     def __init__(self, id: str = None, steer: int = 0, position: np.array = ([0, 0]), velocity: np.array = ([0, 0]),
                  linear: np.array = ([0, 0]), orientation: float = 0, rotation: float = 0, angular: float = 0,
@@ -41,17 +39,25 @@ class character:
         self.arrive_radius = arrive_radius
         self.arrive_slow = arrive_slow
         self.arrive_time = arrive_time
+        
+class steering_output:
+    def __init__(self):
+        self.linear = np.array([0.0, 0.0])
+        self.angular = angular
 
 
 # scenario for different character's behavior
 
 
+
 # Define steering behaviors
 
 
-def steering_continue(self):
+def steering_continue(character):
     # Continue moving without changing direction
-    result = character(linear=self.linear, angular=self.angular)
+    result = steering_output()
+    result.linear = character.linear
+    result.angular = character.angular
     return result
 
 
