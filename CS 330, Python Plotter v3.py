@@ -52,7 +52,7 @@ with open(filename, 'r') as csvfile:
     for row in csvreader:
 
         # as we find other
-        if (row[1] not in movers):  # row[1] holds the id of the Mover
+        if row[1] not in movers:  # row[1] holds the id of the Mover
             movers[row[1]] = Mover(int(row[9]))  # if we don't have a Mover object for a particular id yet,
             # we create one and add it to the dictionary
 
