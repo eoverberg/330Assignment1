@@ -37,11 +37,11 @@ class SteeringOutput(object):
 
 class character:
     # Initialize general movement
-    def __init__(self, id: int = 0, steer: int = 0, position: np.array = ([0.0, 0.0]), velocity: np.array = ([0.0, 0.0]),
-                 linear: np.array = ([0, 0]), orientation: float = 0.0, rotation: float = 0.0, angular: float = 0.0,
-                 max_velocity: float = 0.0,
-                 max_linear: float = 0.0, target: int = 0.0, target_radius: int = 0, arrive_radius: float = 0.0, arrive_slow: float = 0.0,
-                 arrive_time: float = 1):
+    def __init__(self, id = 0, steer = 0, position = np.array([0.0, 0.0]), velocity = np.array([0.0, 0.0]),
+                 linear= np.array([0, 0]), orientation = 0.0, rotation = 0.0, angular = 0.0,
+                 max_velocity = 0.0,
+                 max_linear = 0.0, target = 0.0, target_radius = 0, arrive_radius = 0.0, arrive_slow = 0.0,
+                 arrive_time = 0.0):
         self.id = id
         self.steer = steer
         self.position = position
