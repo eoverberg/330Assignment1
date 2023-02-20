@@ -37,10 +37,10 @@ class SteeringOutput(object):
 
 class character:
     # Initialize general movement
-    def __init__(self, id: str = None, steer: int = 0, position: np.array = ([0, 0]), velocity: np.array = ([0, 0]),
-                 linear: np.array = ([0, 0]), orientation: float = 0, rotation: float = 0, angular: float = 0,
-                 max_velocity: float = 0,
-                 max_linear: float = 0, target: int = 0, target_radius: int = 0, arrive_radius: float = 0, arrive_slow: float = 0,
+    def __init__(self, id: int = 0, steer: int = 0, position: np.array = ([0.0, 0.0]), velocity: np.array = ([0.0, 0.0]),
+                 linear: np.array = ([0, 0]), orientation: float = 0.0, rotation: float = 0.0, angular: float = 0.0,
+                 max_velocity: float = 0.0,
+                 max_linear: float = 0.0, target: int = 0.0, target_radius: int = 0, arrive_radius: float = 0.0, arrive_slow: float = 0.0,
                  arrive_time: float = 1):
         self.id = id
         self.steer = steer
@@ -105,7 +105,7 @@ def steering_arrive(mover, target):  # steering id = 4 *******Could be an issue 
     # Arrive; move directly towards target, slowing down when near.
     result = SteeringOutput()
     # Get the direction to the target.
-    direction = np.array([float, float])
+    direction = np.array([0.0, 0.0])
     direction[0] = target.position[0] - mover.position[0]
     direction[1] = target.position[1] - mover.position[1]
     distance = vector_length(direction)
