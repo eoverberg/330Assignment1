@@ -80,8 +80,8 @@ def steering_seek(mover, target):  # steering id = 2
     # Seek; move directly towards target as fast as possible.
     result = SteeringOutput()
     # Get the direction to the target.
-    result.linear[0] = mover.position[0] - target.position[0]  # gets direction to move based on target's position
-    result.linear[1] = mover.position[1] - target.position[1]  # gets direction to move based on target's position
+    result.linear[0] = target.position[0] - mover.position[0]  # gets direction to move based on target's position
+    result.linear[1] = target.position[1] - mover.position[1]  # gets direction to move based on target's position
     # Give full acceleration along this direction.
     result.linear = normalize(result.linear)  # normalizes the vector
     result.linear = result.linear * mover.max_linear
