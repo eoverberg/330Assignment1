@@ -135,6 +135,7 @@ def steering_arrive(mover, target):  # steering id = 4 *******Could be an issue 
 
 
 def dynamic_update(mover, steering, time):
+    result = SteeringOutput()
     # Update Position and orientation
     mover.position[0] = mover.position[0] + mover.velocity[0] * time
     mover.position[1] = mover.position[1] + mover.velocity[1] * time
@@ -142,23 +143,22 @@ def dynamic_update(mover, steering, time):
 
     # Update Velocity and linear displacement
     acceleration = steering.linear  # get the desired acceleration from the steering behavior
-    mover.velocity[0] = mover.velocity[0] + mover.acceleration[0] * time
-        acceleration) * time  # update the velocity by adding the acceleration
-    mover.velocity[1] = mover.velocity[1] + mover.acceleration[1] * time
-        acceleration) * time  # update the velocity by adding the acceleration
+    mover.velocity[0] = mover.velocity[0] + acceleration[0] * time # update the velocity by adding the acceleration
+    mover.velocity[1] = mover.velocity[1] + acceleration[1] * time # update the velocity by adding the acceleration
     if vector_length(result.linear) > mover.max_linear: # clip the velocity to the max linear speed
         result.linear = normalize(result.linear)
         result.linear = result.linear * mover.max_linear
+    mover.linear = steering.linear
     mover.angular = steering.angular
     return mover
 
 
 def main():
     character1 = character(id="2601", steer=CONTINUE)
-    character2 = character(id="2502", steer=SEEK, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 4,
+    character2 = character(id="2502", steer=FLEE, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 4,
                            rotation=8, max_velocity=8,
                            max_linear=2, target=1, max_acceleration=1.5)
-    character3 = character(id="2503", steer=FLEE, position=[-50, 40], velocity=[0, 8], orientation=3 * math.pi / 2,
+    character3 = character(id="2503", steer=SEEK, position=[-50, 40], velocity=[0, 8], orientation=3 * math.pi / 2,
                            rotation=8,
                            max_linear=2, max_velocity=8, target=1, max_acceleration=1.5)
     character4 = character(id="2504", steer=ARRIVE, position=[50, 75], velocity=[-9, 4], orientation=math.pi,
