@@ -206,7 +206,7 @@ def main():
                 f.write(",")
                 f.write("FALSE")
                 f.write("\n")
-                time = time + delta_time
+            time = time + delta_time
 
 
 if __name__ == main():
