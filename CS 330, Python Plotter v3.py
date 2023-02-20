@@ -96,10 +96,10 @@ for mov in movers:
     # Plot labels for steering behavior type
     label = ""
     if (m.behavior == 1):
-        label = "Stop"
-    elif (m.behavior == 2):
-        label = "Seek"
+        label = "Continue"
     elif (m.behavior == 3):
+        label = "Seek"
+    elif (m.behavior == 2):
         label = "Flee"
     elif (m.behavior == 4):
         label = "Arrive"
