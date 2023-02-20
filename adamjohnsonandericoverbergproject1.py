@@ -142,13 +142,13 @@ def dynamic_update(mover, steering, time):
 
     # Update Velocity and linear displacement
     acceleration = steering.linear  # get the desired acceleration from the steering behavior
-    mover.velocity[0] = mover.velocity[0] + vector_length(
+    mover.velocity[0] = mover.velocity[0] + mover.acceleration[0] * time
         acceleration) * time  # update the velocity by adding the acceleration
-    mover.velocity[1] = mover.velocity[1] + vector_length(
+    mover.velocity[1] = mover.velocity[1] + mover.acceleration[1] * time
         acceleration) * time  # update the velocity by adding the acceleration
-    mover.velocity = np.clip(mover.velocity, -mover.max_linear,
-                             mover.max_linear)  # clip the velocity to the max linear speed
-    mover.linear = mover.linear + mover.velocity * time  # update the linear displacement by adding the new velocity
+    if vector_length(result.linear) > mover.max_linear: # clip the velocity to the max linear speed
+        result.linear = normalize(result.linear)
+        result.linear = result.linear * mover.max_linear
     mover.angular = steering.angular
     return mover
 
