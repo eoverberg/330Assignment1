@@ -41,7 +41,7 @@ class character:
                  linear: np.array = ([0, 0]), orientation: float = 0, rotation: float = 0, angular: float = 0,
                  max_velocity: float = 0,
                  max_linear: float = 0, target: int = 0, target_radius: int = 0, arrive_radius: float = 0, arrive_slow: float = 0,
-                 arrive_time: float = 1):
+                 arrive_time: float = 1, max_acceleration: float = 0):
         self.id = id
         self.steer = steer
         self.position = position
@@ -57,6 +57,7 @@ class character:
         self.arrive_radius = arrive_radius
         self.arrive_slow = arrive_slow
         self.arrive_time = arrive_time
+        self.max_acceleration = max_acceleration
 
 
 # scenario for different character's behavior
@@ -131,31 +132,31 @@ def steering_arrive(mover, target):  # steering id = 4 *******Could be an issue 
     return result
 
 
-def dynamic_update(mover, steering, time):  # This is the movement update function on the rubric
+def dynamic_update(mover, steering, time):
     # Update Position and orientation
-    mover.position[0] = mover.position[0] + (mover.velocity[0] * time)
-    mover.position[1] = mover.position[1] + (mover.velocity[1] * time)
-    mover.orientation = mover.orientation + (mover.rotation * time)
-    # Update Velocity and rotation
-    mover.velocity[0] = mover.velocity[0] + (mover.linear[0] * time)
-    mover.velocity[1] = mover.velocity[1] + (mover.linear[1] * time)
-    #    self.rotation = steering.linear * time + self.rotation
-    mover.rotation = mover.rotation + (steering.angular * time)
-    if vector_length(mover.linear) > mover.max_linear:  # resets the vector
-        mover.linear = normalize(mover.linear)
-        mover.linear = mover.linear * mover.max_linear
+    mover.position[0] = mover.position[0] + mover.velocity[0] * time
+    mover.position[1] = mover.position[1] + mover.velocity[1] * time
+    mover.orientation = mover.orientation + mover.rotation * time
+
+    # Update Velocity and linear displacement
+    acceleration = steering.linear  # get the desired acceleration from the steering behavior
+    mover.velocity[0] = mover.velocity[0] + vector_length(acceleration) * time  # update the velocity by adding the acceleration
+    mover.velocity[1] = mover.velocity[1] + vector_length(acceleration) * time  # update the velocity by adding the acceleration
+    mover.velocity = np.clip(mover.velocity, -mover.max_linear, mover.max_linear)  # clip the velocity to the max linear speed
+    mover.linear = mover.linear + mover.velocity * time  # update the linear displacement by adding the new velocity
     return mover
+
 
 
 def main():
     character1 = character(id="2601", steer=1)
-    character2 = character(id="2502", steer=2, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 2,
-                           rotation=8,
-                           max_linear=2, target=1)
-    character3 = character(id="2503", steer=3, position=[-50, 40], velocity=[0, 8], orientation=math.pi / 2, rotation=8,
-                           max_linear=2, target=1)
-    character4 = character(id="2504", steer=4, position=[50, 75], velocity=[-9, 4], orientation=math.pi / 2, rotation=8,
-                           max_linear=2, target=1)
+    character2 = character(id="2502", steer=2, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 4,
+                           rotation=8, max_velocity= 8,
+                           max_linear=2, target=1, max_acceleration= 1.5)
+    character3 = character(id="2503", steer=3, position=[-50, 40], velocity=[0, 8], orientation= 3 * math.pi / 2, rotation=8,
+                           max_linear=2, max_velocity= 8, target=1, max_acceleration= 1.5)
+    character4 = character(id="2504", steer=4, position=[50, 75], velocity=[-9, 4], orientation= math.pi, rotation=8,
+                           max_linear=2, max_velocity= 10, max_acceleration= 2, target=1, arrive_radius= 4, arrive_slow= 32)
 
     characters = [character1, character2, character3, character4]
     time = 0
@@ -192,6 +193,8 @@ def main():
                 f.write(str(characters[i].orientation))
                 f.write(",")
                 f.write(str(characters[i].steer))
+                f.write(",")
+                f.write("FALSE")
                 f.write("\n")
                 time = time + delta_time
 
