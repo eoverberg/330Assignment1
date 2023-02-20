@@ -145,9 +145,9 @@ def dynamic_update(mover, steering, time):
     acceleration = steering.linear  # get the desired acceleration from the steering behavior
     mover.velocity[0] = mover.velocity[0] + acceleration[0] * time # update the velocity by adding the acceleration
     mover.velocity[1] = mover.velocity[1] + acceleration[1] * time # update the velocity by adding the acceleration
-    if vector_length(result.linear) > mover.max_linear: # clip the velocity to the max linear speed
-        result.linear = normalize(result.linear)
-        result.linear = result.linear * mover.max_linear
+    if vector_length(mover.velocity) > mover.max_velocity: # clip the velocity to the max linear speed
+        mover.velocity = normalize(mover.velocity)
+        mover.velocity = mover.velocity * mover.max_linear
     mover.linear = steering.linear
     mover.angular = steering.angular
     return mover
@@ -160,7 +160,7 @@ def main():
                            max_linear=2, target=1, max_acceleration=1.5)
     character3 = character(id="2503", steer=SEEK, position=[-50, 40], velocity=[0, 8], orientation=3 * math.pi / 2,
                            rotation=8,
-                           max_linear=2, max_velocity=8, target=1, max_acceleration=1.5)
+                           max_linear=2, max_velocity=8, target=1, max_acceleration=2)
     character4 = character(id="2504", steer=ARRIVE, position=[50, 75], velocity=[-9, 4], orientation=math.pi,
                            rotation=8,
                            max_linear=2, max_velocity=10, max_acceleration=2, target=1, arrive_radius=4, arrive_slow=32)
