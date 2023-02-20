@@ -65,16 +65,16 @@ class character:
 # Define steering behaviors
 
 
-def steering_continue(character):
+def steering_continue(mover):
     # Continue moving without changing direction
     result = SteeringOutput()
-    result.linear = character.linear
-    result.angular = character.angular
+    result.linear = mover.linear
+    result.angular = mover.angular
     return result
 
 
 # note: mover is the character
-def steering_seek(mover, target):  # steering ds = 2
+def steering_seek(mover, target):  # steering id = 2
     # Seek; move directly towards target as fast as possible.
     result = SteeringOutput()
     # Get the direction to the target.
@@ -173,7 +173,7 @@ def main():
                 elif characters[i].steer == ARRIVE:
                     steering = steering_arrive(characters[i], character1)
                 characters[i] = dynamic_update(characters[i], steering, delta_time)
-                f.write(str(delta_time))
+                f.write(str(time))
                 f.write(",")
                 f.write(str(characters[i].id))
                 f.write(",")
