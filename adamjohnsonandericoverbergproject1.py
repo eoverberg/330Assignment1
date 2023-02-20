@@ -29,13 +29,13 @@ def normalize(vector):
     return result
 
 
-class SteeringOutput(object):
+class steering_output(object):
     def __init__(self):
         self.linear = np.array([0.0, 0.0])
         self.angular = 0.0
 
 
-class character:
+class character(object):
     # Initialize general movement
     def __init__(self, id = 0, steer = 0, position = np.array([0.0, 0.0]), velocity = np.array([0.0, 0.0]),
                  linear= np.array([0, 0]), orientation = 0.0, rotation = 0.0, angular = 0.0,
@@ -67,7 +67,7 @@ class character:
 
 def steering_continue(mover):
     # Continue moving without changing direction
-    result = SteeringOutput()
+    result = steering_output()
     result.linear = mover.linear
     result.angular = mover.angular
     return result
@@ -76,7 +76,7 @@ def steering_continue(mover):
 # note: mover is the character
 def steering_seek(mover, target):  # steering id = 2
     # Seek; move directly towards target as fast as possible.
-    result = SteeringOutput()
+    result = steering_output()
     # Get the direction to the target.
     result.linear[0] = mover.position[0] - target.position[0]  # gets direction to move based on target's position
     result.linear[1] = mover.position[1] - target.position[1]  # gets direction to move based on target's position
@@ -90,7 +90,7 @@ def steering_seek(mover, target):  # steering id = 2
 #
 def steering_flee(mover, target):  # steering id = 3
     # Flee;  move directly away from target as fast as possible.
-    result = SteeringOutput()
+    result = steering_output()
     # Get the direction to the target.
     result.linear[0] = mover.position[0] - target.position[0]  # gets direction to move based on target's position
     result.linear[1] = mover.position[1] - target.position[1]  # gets direction to move based on target's position
@@ -103,7 +103,7 @@ def steering_flee(mover, target):  # steering id = 3
 
 def steering_arrive(mover, target):  # steering id = 4 *******Could be an issue soon
     # Arrive; move directly towards target, slowing down when near.
-    result = SteeringOutput()
+    result = steering_output()
     # Get the direction to the target.
     direction = np.array([0.0, 0.0])
     direction[0] = target.position[0] - mover.position[0]
