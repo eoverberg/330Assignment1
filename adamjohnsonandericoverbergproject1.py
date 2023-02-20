@@ -40,7 +40,8 @@ class character:
     def __init__(self, id: str = None, steer: int = 0, position: np.array = ([0, 0]), velocity: np.array = ([0, 0]),
                  linear: np.array = ([0, 0]), orientation: float = 0, rotation: float = 0, angular: float = 0,
                  max_velocity: float = 0,
-                 max_linear: float = 0, target: int = 0, target_radius: int = 0, arrive_radius: float = 0, arrive_slow: float = 0,
+                 max_linear: float = 0, target: int = 0, target_radius: int = 0, arrive_radius: float = 0,
+                 arrive_slow: float = 0,
                  arrive_time: float = 1, max_acceleration: float = 0):
         self.id = id
         self.steer = steer
@@ -129,6 +130,7 @@ def steering_arrive(mover, target):  # steering id = 4 *******Could be an issue 
     if vector_length(result.linear) > mover.max_linear:  # resets the vector
         result.linear = normalize(result.linear)
         result.linear = result.linear * mover.max_linear
+    result.angular = 0
     return result
 
 
@@ -140,23 +142,28 @@ def dynamic_update(mover, steering, time):
 
     # Update Velocity and linear displacement
     acceleration = steering.linear  # get the desired acceleration from the steering behavior
-    mover.velocity[0] = mover.velocity[0] + vector_length(acceleration) * time  # update the velocity by adding the acceleration
-    mover.velocity[1] = mover.velocity[1] + vector_length(acceleration) * time  # update the velocity by adding the acceleration
-    mover.velocity = np.clip(mover.velocity, -mover.max_linear, mover.max_linear)  # clip the velocity to the max linear speed
+    mover.velocity[0] = mover.velocity[0] + vector_length(
+        acceleration) * time  # update the velocity by adding the acceleration
+    mover.velocity[1] = mover.velocity[1] + vector_length(
+        acceleration) * time  # update the velocity by adding the acceleration
+    mover.velocity = np.clip(mover.velocity, -mover.max_linear,
+                             mover.max_linear)  # clip the velocity to the max linear speed
     mover.linear = mover.linear + mover.velocity * time  # update the linear displacement by adding the new velocity
+    mover.angular = steering.angular
     return mover
 
 
-
 def main():
-    character1 = character(id="2601", steer=1)
-    character2 = character(id="2502", steer=2, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 4,
-                           rotation=8, max_velocity= 8,
-                           max_linear=2, target=1, max_acceleration= 1.5)
-    character3 = character(id="2503", steer=3, position=[-50, 40], velocity=[0, 8], orientation= 3 * math.pi / 2, rotation=8,
-                           max_linear=2, max_velocity= 8, target=1, max_acceleration= 1.5)
-    character4 = character(id="2504", steer=4, position=[50, 75], velocity=[-9, 4], orientation= math.pi, rotation=8,
-                           max_linear=2, max_velocity= 10, max_acceleration= 2, target=1, arrive_radius= 4, arrive_slow= 32)
+    character1 = character(id="2601", steer=CONTINUE)
+    character2 = character(id="2502", steer=SEEK, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 4,
+                           rotation=8, max_velocity=8,
+                           max_linear=2, target=1, max_acceleration=1.5)
+    character3 = character(id="2503", steer=FLEE, position=[-50, 40], velocity=[0, 8], orientation=3 * math.pi / 2,
+                           rotation=8,
+                           max_linear=2, max_velocity=8, target=1, max_acceleration=1.5)
+    character4 = character(id="2504", steer=ARRIVE, position=[50, 75], velocity=[-9, 4], orientation=math.pi,
+                           rotation=8,
+                           max_linear=2, max_velocity=10, max_acceleration=2, target=1, arrive_radius=4, arrive_slow=32)
 
     characters = [character1, character2, character3, character4]
     time = 0
@@ -169,10 +176,13 @@ def main():
                     steering = steering_continue(characters[i])
                 elif characters[i].steer == SEEK:
                     steering = steering_seek(characters[i], character1)
+                    characters[i].linear = steering.linear
                 elif characters[i].steer == FLEE:
                     steering = steering_flee(characters[i], character1)
+                    characters[i].linear = steering.linear
                 elif characters[i].steer == ARRIVE:
                     steering = steering_arrive(characters[i], character1)
+                    characters[i].linear = steering.linear
                 characters[i] = dynamic_update(characters[i], steering, delta_time)
                 f.write(str(time))
                 f.write(",")
