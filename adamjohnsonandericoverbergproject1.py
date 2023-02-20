@@ -29,19 +29,19 @@ def normalize(vector):
     return result
 
 
-class steering_output(object):
+class SteeringOutput(object):
     def __init__(self):
         self.linear = np.array([0.0, 0.0])
         self.angular = 0.0
 
 
-class character(object):
+class character:
     # Initialize general movement
-    def __init__(self, id = 0, steer = 0, position = np.array([0.0, 0.0]), velocity = np.array([0.0, 0.0]),
-                 linear= np.array([0, 0]), orientation = 0.0, rotation = 0.0, angular = 0.0,
-                 max_velocity = 0.0,
-                 max_linear = 0.0, target = 0.0, target_radius = 0, arrive_radius = 0.0, arrive_slow = 0.0,
-                 arrive_time = 0.0):
+    def __init__(self, id: str = None, steer: int = 0, position: np.array = ([0, 0]), velocity: np.array = ([0, 0]),
+                 linear: np.array = ([0, 0]), orientation: float = 0, rotation: float = 0, angular: float = 0,
+                 max_velocity: float = 0,
+                 max_linear: float = 0, target: int = 0, target_radius: int = 0, arrive_radius: float = 0, arrive_slow: float = 0,
+                 arrive_time: float = 1):
         self.id = id
         self.steer = steer
         self.position = position
@@ -67,7 +67,7 @@ class character(object):
 
 def steering_continue(mover):
     # Continue moving without changing direction
-    result = steering_output()
+    result = SteeringOutput()
     result.linear = mover.linear
     result.angular = mover.angular
     return result
@@ -76,7 +76,7 @@ def steering_continue(mover):
 # note: mover is the character
 def steering_seek(mover, target):  # steering id = 2
     # Seek; move directly towards target as fast as possible.
-    result = steering_output()
+    result = SteeringOutput()
     # Get the direction to the target.
     result.linear[0] = mover.position[0] - target.position[0]  # gets direction to move based on target's position
     result.linear[1] = mover.position[1] - target.position[1]  # gets direction to move based on target's position
@@ -90,7 +90,7 @@ def steering_seek(mover, target):  # steering id = 2
 #
 def steering_flee(mover, target):  # steering id = 3
     # Flee;  move directly away from target as fast as possible.
-    result = steering_output()
+    result = SteeringOutput()
     # Get the direction to the target.
     result.linear[0] = mover.position[0] - target.position[0]  # gets direction to move based on target's position
     result.linear[1] = mover.position[1] - target.position[1]  # gets direction to move based on target's position
@@ -103,9 +103,9 @@ def steering_flee(mover, target):  # steering id = 3
 
 def steering_arrive(mover, target):  # steering id = 4 *******Could be an issue soon
     # Arrive; move directly towards target, slowing down when near.
-    result = steering_output()
+    result = SteeringOutput()
     # Get the direction to the target.
-    direction = np.array([0.0, 0.0])
+    direction = np.array([float, float])
     direction[0] = target.position[0] - mover.position[0]
     direction[1] = target.position[1] - mover.position[1]
     distance = vector_length(direction)
