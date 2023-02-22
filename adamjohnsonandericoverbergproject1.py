@@ -15,12 +15,12 @@ SEEK = 3
 ARRIVE = 4
 
 
-# calculate length of 2D vector
+"""calculate length of 2D vector"""
 def vector_length(vector):
     return math.sqrt(vector[0] ** 2 + vector[1] ** 2)
 
 
-# normalize vector
+"""normalize vector"""
 def normalize(vector):
     length = vector_length(vector)
     if length == 0:
@@ -29,14 +29,14 @@ def normalize(vector):
     return result
 
 
-class SteeringOutput(object):
+class steering_output(object):
     def __init__(self):
         self.linear = np.array([0.0, 0.0])
         self.angular = 0.0
 
 
 class character:
-    # Initialize general movement
+    """Initialize general movement"""
     def __init__(self, id: str = None, steer: int = 0, position: np.array = ([0, 0]), velocity: np.array = ([0, 0]),
                  linear: np.array = ([0, 0]), orientation: float = 0, rotation: float = 0, angular: float = 0,
                  max_velocity: float = 0,
@@ -61,29 +61,29 @@ class character:
         self.max_acceleration = max_acceleration
 
 
-# scenario for different character's behavior
+"""scenario for different character's behavior"""
 
 
-# Define steering behaviors
+"""Define steering behaviors"""
 
 
 def steering_continue(mover):
-    # Continue moving without changing direction
-    result = SteeringOutput()
+    """Continue moving without changing direction"""
+    result = steering_output()
     result.linear = mover.linear
     result.angular = mover.angular
     return result
 
 
-# note: mover is the character
-def steering_seek(mover, target):  # steering id = 2
-    # Seek; move directly towards target as fast as possible.
-    result = SteeringOutput()
-    # Get the direction to the target.
-    result.linear[0] = target.position[0] - mover.position[0]  # gets direction to move based on target's position
-    result.linear[1] = target.position[1] - mover.position[1]  # gets direction to move based on target's position
-    # Give full acceleration along this direction.
-    result.linear = normalize(result.linear)  # normalizes the vector
+"""note: mover is the character"""
+def steering_seek(mover, target): 
+    """Seek; move directly towards target as fast as possible."""
+    result = steering_output()
+    """Get the direction to the target."""
+    result.linear[0] = target.position[0] - mover.position[0]  """gets direction to move based on target's position"""
+    result.linear[1] = target.position[1] - mover.position[1]  """gets direction to move based on target's position"""
+    """Give full acceleration along this direction."""
+    result.linear = normalize(result.linear)  """normalizes the vector"""
     result.linear = result.linear * mover.max_linear
     result.angular = 0
     return result
@@ -91,43 +91,44 @@ def steering_seek(mover, target):  # steering id = 2
 
 #
 def steering_flee(mover, target):  # steering id = 3
-    # Flee;  move directly away from target as fast as possible.
-    result = SteeringOutput()
-    # Get the direction to the target.
-    result.linear[0] = mover.position[0] - target.position[0]  # gets direction to move based on target's position
-    result.linear[1] = mover.position[1] - target.position[1]  # gets direction to move based on target's position
-    # Give full acceleration along this direction.
-    result.linear = normalize(result.linear)  # normalizes the vector
+    """Flee;  move directly away from target as fast as possible."""
+    result = steering_output()
+    """Get the direction to the target."""
+    result.linear[0] = mover.position[0] - target.position[0]  """gets direction to move based on target's position"""
+    result.linear[1] = mover.position[1] - target.position[1]  """gets direction to move based on target's position"""
+    """Give full acceleration along this direction."""
+    result.linear = normalize(result.linear) """normalizes the vector"""
     result.linear = result.linear * mover.max_linear
     result.angular = 0
     return result
 
 
-def steering_arrive(mover, target):  # steering id = 4 *******Could be an issue soon
-    # Arrive; move directly towards target, slowing down when near.
-    result = SteeringOutput()
-    # Get the direction to the target.
+def steering_arrive(mover, target):  
+    """Arrive; move directly towards target, slowing down when near."""
+    result = steering_output()
+    """Get the direction to the target."""
     direction = np.array([float, float])
     direction[0] = target.position[0] - mover.position[0]
     direction[1] = target.position[1] - mover.position[1]
     distance = vector_length(direction)
-    # check if we are, return no steering
+    """Check if we are, return no steering"""
     if distance < mover.target_radius:
         mover.velocity = 0
-    # If we are outside the slowRadius, then move at max speed.
-    if distance < mover.arrive_radius:  # slow down when in range
+    """If we are outside the slowRadius, then move at max speed."""
+    if distance < mover.arrive_radius:  """"slow down when in range"""
         arrive_speed = 0
-    elif distance > mover.arrive_slow:  # set speed to max otherwise
+    elif distance > mover.arrive_slow:  """set speed to max otherwise"""
         arrive_speed = mover.max_velocity
     else:
         arrive_speed = mover.max_velocity * distance / mover.arrive_slow
-    # The target velocity combines speed and direction
+    """The target velocity combines speed and direction"""
     arrive_velocity = normalize(direction) * arrive_speed
     result.linear[0] = arrive_velocity[0] - mover.velocity[0]
     result.linear[1] = arrive_velocity[1] - mover.velocity[1]
     result.linear[0] = result.linear[0] / mover.arrive_time
     result.linear[1] = result.linear[1] / mover.arrive_time
-    if vector_length(result.linear) > mover.max_linear:  # resets the vector
+    """resets the vector"""
+    if vector_length(result.linear) > mover.max_linear:  
         result.linear = normalize(result.linear)
         result.linear = result.linear * mover.max_linear
     result.angular = 0
@@ -135,17 +136,17 @@ def steering_arrive(mover, target):  # steering id = 4 *******Could be an issue 
 
 
 def dynamic_update(mover, steering, time):
-    result = SteeringOutput()
-    # Update Position and orientation
+    result = steering_output()
+    """Update Position and orientation"""
     mover.position[0] = mover.position[0] + mover.velocity[0] * time
     mover.position[1] = mover.position[1] + mover.velocity[1] * time
     mover.orientation = mover.orientation + mover.rotation * time
 
-    # Update Velocity and linear displacement
-    acceleration = steering.linear  # get the desired acceleration from the steering behavior
-    mover.velocity[0] = mover.velocity[0] + acceleration[0] * time  # update the velocity by adding the acceleration
-    mover.velocity[1] = mover.velocity[1] + acceleration[1] * time  # update the velocity by adding the acceleration
-    if vector_length(mover.velocity) > mover.max_velocity:  # clip the velocity to the max linear speed
+    """Update Velocity and linear displacement"""
+    acceleration = steering.linear  """get the desired acceleration from the steering behavior"""
+    mover.velocity[0] = mover.velocity[0] + acceleration[0] * time  """update the velocity by adding the acceleration"""
+    mover.velocity[1] = mover.velocity[1] + acceleration[1] * time  """update the velocity by adding the acceleration"""
+    if vector_length(mover.velocity) > mover.max_velocity:  """clip the velocity to the max linear speed"""
         mover.velocity = normalize(mover.velocity)
         mover.velocity = mover.velocity * mover.max_velocity
     mover.linear = steering.linear
@@ -169,7 +170,7 @@ def main():
     time = 0
     delta_time = 0.50
     time_stop = 50
-    with open("trajectoryfile.txt", "w") as f:  # creates a file and writes in all trajectory data
+    with open("trajectoryfile.txt", "w") as f:  """creates a file and writes in all trajectory data"""
         while time <= time_stop:
             for i in range(len(characters)):
                 if characters[i].steer == CONTINUE:
