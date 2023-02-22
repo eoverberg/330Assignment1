@@ -32,7 +32,7 @@ def vector_dot(A, B)
 
 """
 Find point on line closest to query point in 2D.
-Q is the query point, A and B are distinct points on the line, as vectors
+Q is the query point, A and B are distinct points on the line, as vector
 """
 def closest_point_line(Q, A, B)
     T = vector_dot((Q - A), (B - A)) / vector_dot((B - A), (B - A))
