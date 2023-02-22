@@ -1,11 +1,10 @@
-# Class: CS 330
-# Authors: Adam Johnson & Erik Overberg
-# Program: Assignment 1
-# initialize steering behavior
+"""
+Class: CS 330
+Authors: Adam Johnson & Erik Overberg
+Program: Assignment 1
+"""
 
-# TODO::
-# Clip max velocity in movement update
-#
+
 import math
 import numpy as np
 
@@ -19,7 +18,6 @@ ARRIVE = 4
 def vector_length(vector):
     return math.sqrt(vector[0] ** 2 + vector[1] ** 2)
 
-
 """normalize vector"""
 def normalize(vector):
     length = vector_length(vector)
@@ -28,13 +26,25 @@ def normalize(vector):
     result = np.array([vector[0] / length, vector[1] / length])
     return result
 
+"""Calculate scalar dot product of two 2D vectors"""
+def vector_dot(A, B)
+    return np.sum(A * B)
 
+"""
+Find point on line closest to query point in 2D.
+Q is the query point, A and B are distinct points on the line, as vectors
+"""
+def closest_point_line(Q, A, B)
+    T = vector_dot((Q - A), (B - A)) / vector_dot((B - A), (B - A))
+    return(A + (T * (B - A)))
+
+"""class for steering output of characters"""
 class steering_output(object):
     def __init__(self):
         self.linear = np.array([0.0, 0.0])
         self.angular = 0.0
 
-
+"""class to create character instances"""
 class character:
     """Initialize general movement"""
     def __init__(self, id: str = None, steer: int = 0, position: np.array = ([0, 0]), velocity: np.array = ([0, 0]),
