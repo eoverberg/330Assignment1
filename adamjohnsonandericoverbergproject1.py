@@ -42,7 +42,7 @@ def closest_point_segment(Q, A, B)
     T = vector_dot((Q - A), (B - A)) / vector_dot((B - A), (B - A))
     if T <= 0:
         return A
-    if T >= 1:
+    elif T >= 1:
         return B
     else:
         return A + (T * (B - A))
