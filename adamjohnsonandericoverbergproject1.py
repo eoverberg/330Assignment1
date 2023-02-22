@@ -36,6 +36,17 @@ def closest_point_line(Q, A, B)
     T = vector_dot((Q - A), (B - A)) / vector_dot((B - A), (B - A))
     return(A + (T * (B - A)))
 
+"""FInd point on segment closest to query point in 2D."""\
+def closest_point_segment(Q, A, B)
+    T = vector_dot((Q - A), (B - A)) / vector_dot((B - A), (B - A))
+    if T <= 0:
+        return A
+    if T >= 1:
+        return B
+    else:
+        return A + (T * (B - A))
+        
+
 """class for steering output of characters"""
 class steering_output(object):
     def __init__(self):
