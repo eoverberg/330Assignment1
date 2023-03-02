@@ -30,6 +30,11 @@ def normalize(vector):
 def vector_dot(A, B)
     return np.sum(A * B)
 
+"""calculate Euclidean distance between two points in 2D"""
+def distance_point_point(p1, p2):
+    return np.sqrt((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2)
+
+                    
 """Find point on line closest to query point in 2D."""
 """Q is the query point, A and B are distinct points on the line, as vectors"""
 def closest_point_line(Q, A, B)
@@ -46,7 +51,26 @@ def closest_point_segment(Q, A, B)
         return B
     else:
         return A + (T * (B - A))
-        
+    
+"""Assemble a complete path data structure from its coordinates"""
+def path_assemble(path_id, path_x, path_y):
+    path_segments = len(path_x) - 1
+    path_distance = np.zeros(path_segements + 1)
+    for i in range(1, path_segments + 1):
+        path_distance[i] = path_distance[i - 1] + distance_point_point([path_x[i - 1], path_y[i - 1]], [path_x[i], path_y[i]])
+    path_param = np.zeros(path_segments + 1):
+        path_param[i] = path_distance[i] / max(path_distance)
+    return path_id, path_x, path_y, path_distance, path_param, path_segment
+
+"""Caclulate position on path"""
+def path_get_position(path, param):
+    i = max(np.where(param > path.param)[0])
+    """Find segment S on path H with endpoints A and B"""
+    A = np.array([path.x[i], path.y[i]])
+    B = np.array([path.x[i + 1], path.y[i + 1]])
+    T = (param - path.param[i]) / path.param[i + 1] - path.param[i])
+    P = A + T * (B - A)
+    return P
 
 """class for steering output of characters"""
 class steering_output(object):
