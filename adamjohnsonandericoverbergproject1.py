@@ -1,7 +1,7 @@
 """
 Class: CS 330
 Authors: Adam Johnson & Erik Overberg
-Program: Assignment 1
+Program: Assignment 2
 """
 
 
