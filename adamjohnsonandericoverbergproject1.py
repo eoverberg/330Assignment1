@@ -80,7 +80,7 @@ class steering_output(object):
         self.angular = 0.0
 
 """class to create character instances"""
-class character:
+class character(object):
     """Initialize general movement"""
     def __init__(self, id: str = None, steer: int = 0, position: np.array = ([0, 0]), velocity: np.array = ([0, 0]),
                  linear: np.array = ([0, 0]), orientation: float = 0, rotation: float = 0, angular: float = 0,
@@ -106,7 +106,7 @@ class character:
         self.max_acceleration = max_acceleration
         
 """class for path instances"""
-class path:
+class path(object):
     """initialize array for path"""
     def __init___(self, id: str = None, x: np.array = ([0,0]), y: np.array = ([0,0]), params: np.array([0,0]),
                   distance: np.array([0,0]), segments: int = 0)
@@ -210,6 +210,14 @@ def dynamic_update(mover, steering, time):
     mover.angular = steering.angular
     return mover
 
+def steering_follow_path(mover, path):
+    result = steering_output()
+    """calculate target to delegate to face"""
+    """Find current position on the path"""
+    
+    
+    
+
 
 def main():
     character1 = character(id="2601", steer=CONTINUE)
@@ -241,6 +249,8 @@ def main():
                 elif characters[i].steer == ARRIVE:
                     steering = steering_arrive(characters[i], character1)
                     characters[i].linear = steering.linear
+                elif character[i].steer == FOLLOWPATH:
+                    steering = steering_follow_path(character[i], character1)
                 characters[i] = dynamic_update(characters[i], steering, delta_time)
                 f.write(str(time))
                 f.write(",")
