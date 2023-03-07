@@ -12,6 +12,7 @@ CONTINUE = 1
 FLEE = 2
 SEEK = 3
 ARRIVE = 4
+FOLLOWPATH = 5
 
 
 """calculate length of 2D vector"""
