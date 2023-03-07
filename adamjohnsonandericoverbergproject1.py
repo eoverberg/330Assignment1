@@ -103,6 +103,18 @@ class character:
         self.arrive_slow = arrive_slow
         self.arrive_time = arrive_time
         self.max_acceleration = max_acceleration
+        
+"""class for path instances"""
+class path:
+    """initialize array for path"""
+    def __init___(self, id: str = None, x: np.array = ([0,0]), y: np.array = ([0,0]), params: np.array([0,0]),
+                  distance: np.array([0,0]), segments: int = 0)
+        self.id = id
+        self.x = x """Array of x coordinates"""
+        self.y = y """Array of y coordinates"""
+        self.params = params """Array of path parameters at each vertex"""
+        self.distance = distance """Array of path distance at each vertex"""
+        self.segments = segments """Number of segemnts in the path"""
 
 
 """scenario for different character's behavior"""
