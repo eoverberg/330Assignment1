@@ -19,12 +19,12 @@ FOLLOWPATH = 5
 def vector_length(vector):
     return math.sqrt(vector[0] ** 2 + vector[1] ** 2)
 
-"""normalize vector"""
+"""normalize vector (keep direction but make the length = 1"""
 def normalize(vector):
-    length = vector_length(vector)
-    if length == 0:
+    vector_length = length(vector)
+    if vector_length == 0:
         return vector
-    result = np.array([vector[0] / length, vector[1] / length])
+    result = np.array([vector[0] / vector_length, vector[1] / vector_length])
     return result
 
 """Calculate scalar dot product of two 2D vectors"""
@@ -32,8 +32,8 @@ def vector_dot(A, B)
     return np.sum(A * B)
 
 """calculate Euclidean distance between two points in 2D"""
-def distance_point_point(p1, p2):
-    return np.sqrt((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2)
+def distance_point_point(P, Q):
+    return np.sqrt((P[0] - Q[0])**2 + (P[1] - Q[1])**2)
 
                     
 """Find point on line closest to query point in 2D."""
@@ -56,7 +56,7 @@ def closest_point_segment(Q, A, B)
 """Assemble a complete path data structure from its coordinates"""
 def path_assemble(path_id, path_x, path_y):
     path_segments = len(path_x) - 1
-    path_distance = np.zeros(path_segements + 1)
+    path_distance = np.zeros(path_segments + 1)
     for i in range(1, path_segments + 1):
         path_distance[i] = path_distance[i - 1] + distance_point_point([path_x[i - 1], path_y[i - 1]], [path_x[i], path_y[i]])
     path_param = np.zeros(path_segments + 1):
@@ -64,7 +64,7 @@ def path_assemble(path_id, path_x, path_y):
     return path_id, path_x, path_y, path_distance, path_param, path_segment
 
 """Caclulate position on path"""
-def path_get_position(path, param):
+def path_position(path, param):
     i = max(np.where(param > path.param)[0])
     """Find segment S on path H with endpoints A and B"""
     A = np.array([path.x[i], path.y[i]])
@@ -72,6 +72,22 @@ def path_get_position(path, param):
     T = (param - path.param[i]) / path.param[i + 1] - path.param[i])
     P = A + T * (B - A)
     return P
+
+def path_param(path, position)
+    """Find point on path closest to given position"""
+    closest_distance = np.inf
+    for i in range(1, path.segments):
+        A = np.array([path.x[i-1], path.y[i-1]])
+        B = np.array([path.x[i], path.y[i]])
+        check_point = closest_point_segment(position, A, B)
+        check_distance = distance_point_point(position, check_point)
+        if check_distance < closest_distance:
+            closest_point = check_point
+            closest_distance = check_distance
+            closest_segment = i
+            
+    return closest_segment
+
 
 """class for steering output of characters"""
 class steering_output(object):
@@ -87,7 +103,7 @@ class character(object):
                  max_velocity: float = 0,
                  max_linear: float = 0, target: int = 0, target_radius: int = 0, arrive_radius: float = 0,
                  arrive_slow: float = 0,
-                 arrive_time: float = 1, max_acceleration: float = 0):
+                 arrive_time: float = 1, max_acceleration: float = 0, path_to_follow: int = 0, path_offset: float = 0):
         self.id = id
         self.steer = steer
         self.position = position
@@ -104,11 +120,13 @@ class character(object):
         self.arrive_slow = arrive_slow
         self.arrive_time = arrive_time
         self.max_acceleration = max_acceleration
+        self.path_to_follow = path_to_follow """For PA 2"""
+        self.path_offset = path_offset """for PA 2"""
         
 """class for path instances"""
 class path(object):
     """initialize array for path"""
-    def __init___(self, id: str = None, x: np.array = ([0,0]), y: np.array = ([0,0]), params: np.array([0,0]),
+    def __init___(self, id: int = 0, x: np.array = ([0,0]), y: np.array = ([0,0]), params: np.array([0,0]),
                   distance: np.array([0,0]), segments: int = 0)
         self.id = id
         self.x = x """Array of x coordinates"""
@@ -214,7 +232,7 @@ def steering_follow_path(mover, path):
     result = steering_output()
     """calculate target to delegate to face"""
     """Find current position on the path"""
-    
+    current_param = 
     
     
 
