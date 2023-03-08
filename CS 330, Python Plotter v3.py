@@ -16,7 +16,7 @@ import csv
 import math
 
 # Change this to data file name
-filename = "trajectoryfile.txt"
+filename = "output.txt"
 
 # ************************** Setup Plotting Axis ****************************
 xLineX = [-100, 100]
