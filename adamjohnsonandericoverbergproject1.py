@@ -19,7 +19,7 @@ FOLLOWPATH = 5
 
 
 """calculate length of 2D vector"""
-def vector_length(vector):
+def length(vector):
     return math.sqrt(vector[0] ** 2 + vector[1] ** 2)
 
 """normalize vector (keep direction but make the length = 1"""
@@ -62,9 +62,9 @@ def path_assemble(path_id, path_x, path_y):
     path_distance = np.zeros(path_segments + 1)
     for i in range(1, path_segments + 1):
         path_distance[i] = path_distance[i - 1] + distance_point_point([path_x[i - 1], path_y[i - 1]], [path_x[i], path_y[i]])
-    path_param = np.zeros(path_segments + 1):
-        path_param[i] = path_distance[i] / max(path_distance)
-    return path_id, path_x, path_y, path_distance, path_param, path_segment
+    path_param = np.zeros(path_segments + 1)
+    path_param[i] = path_distance[i] / max(path_distance)
+    return path_id, path_x, path_y, path_distance, path_param, path_segments
 
 """Caclulate position on path"""
 def path_position(path, param):
@@ -123,28 +123,29 @@ class character(object):
         self.arrive_slow = arrive_slow
         self.arrive_time = arrive_time
         self.max_acceleration = max_acceleration
-        self.path_to_follow = path_to_follow """For PA 2"""
-        self.path_offset = path_offset """for PA 2"""
+        self.path_to_follow = path_to_follow 
+        self.path_offset = path_offset
         
 """class for path instances"""
 class path(object):
     """initialize array for path"""
-    def __init___(self, id: int = 0, x: np.array = ([0,0]), y: np.array = ([0,0]), params: np.array([0,0]),
-                  distance: np.array([0,0]), segments: int = 0)
+    def __init___(self, id: int = 0, x: np.array = ([0,0]), y: np.array = ([0,0]), params: np.array = ([0,0]),
+                  distance: np.array = ([0,0]), segments: int = 0):
         self.id = id
-        self.x = x """Array of x coordinates"""
-        self.y = y """Array of y coordinates"""
-        self.params = params """Array of path parameters at each vertex"""
-        self.distance = distance """Array of path distance at each vertex"""
-        self.segments = segments """Number of segemnts in the path"""
-
+        """Array of x coordinates"""
+        self.x = x 
+        """Array of y coordinates"""
+        self.y = y 
+        """Array of path parameters at each vertex"""
+        self.params = params 
+        """Array of path distance at each vertex"""
+        self.distance = distance 
+        """Number of segemnts in the path"""
+        self.segments = segments 
 
 """scenario for different character's behavior"""
 
-
 """Define steering behaviors"""
-
-
 def steering_continue(mover):
     """Continue moving without changing direction"""
     result = steering_output()
@@ -158,24 +159,25 @@ def steering_seek(mover, target):
     """Seek; move directly towards target as fast as possible."""
     result = steering_output()
     """Get the direction to the target."""
-    result.linear[0] = target.position[0] - mover.position[0]  """gets direction to move based on target's position"""
-    result.linear[1] = target.position[1] - mover.position[1]  """gets direction to move based on target's position"""
+    """gets direction to move based on target's position"""
+    result.linear[0] = target.position[0] - mover.position[0]  
+    result.linear[1] = target.position[1] - mover.position[1]  
     """Give full acceleration along this direction."""
-    result.linear = normalize(result.linear)  """normalizes the vector"""
+    """normalizes the vector"""
+    result.linear = normalize(result.linear) 
     result.linear = result.linear * mover.max_linear
     result.angular = 0
     return result
 
-
-#
-def steering_flee(mover, target):  # steering id = 3
+def steering_flee(mover, target):  
     """Flee;  move directly away from target as fast as possible."""
     result = steering_output()
     """Get the direction to the target."""
-    result.linear[0] = mover.position[0] - target.position[0]  """gets direction to move based on target's position"""
-    result.linear[1] = mover.position[1] - target.position[1]  """gets direction to move based on target's position"""
+    result.linear[0] = mover.position[0] - target.position[0]  
+    result.linear[1] = mover.position[1] - target.position[1]  
     """Give full acceleration along this direction."""
-    result.linear = normalize(result.linear) """normalizes the vector"""
+    """normalizes the vector"""
+    result.linear = normalize(result.linear) 
     result.linear = result.linear * mover.max_linear
     result.angular = 0
     return result
@@ -188,14 +190,16 @@ def steering_arrive(mover, target):
     direction = np.array([float, float])
     direction[0] = target.position[0] - mover.position[0]
     direction[1] = target.position[1] - mover.position[1]
-    distance = vector_length(direction)
+    distance = length(direction)
     """Check if we are, return no steering"""
     if distance < mover.target_radius:
         mover.velocity = 0
     """If we are outside the slowRadius, then move at max speed."""
-    if distance < mover.arrive_radius:  """"slow down when in range"""
+    """slow down when in range"""
+    if distance < mover.arrive_radius:  
         arrive_speed = 0
-    elif distance > mover.arrive_slow:  """set speed to max otherwise"""
+    """set speed to max otherwise"""
+    if distance > mover.arrive_slow:  
         arrive_speed = mover.max_velocity
     else:
         arrive_speed = mover.max_velocity * distance / mover.arrive_slow
@@ -221,10 +225,12 @@ def dynamic_update(mover, steering, time):
     mover.orientation = mover.orientation + mover.rotation * time
 
     """Update Velocity and linear displacement"""
-    acceleration = steering.linear  """get the desired acceleration from the steering behavior"""
-    mover.velocity[0] = mover.velocity[0] + acceleration[0] * time  """update the velocity by adding the acceleration"""
-    mover.velocity[1] = mover.velocity[1] + acceleration[1] * time  """update the velocity by adding the acceleration"""
-    if vector_length(mover.velocity) > mover.max_velocity:  """clip the velocity to the max linear speed"""
+    """get the desired acceleration from the steering behavior"""
+    acceleration = steering.linear 
+    mover.velocity[0] = mover.velocity[0] + acceleration[0] * time  
+    mover.velocity[1] = mover.velocity[1] + acceleration[1] * time  
+    """clip the velocity to the max linear speed"""
+    if length(mover.velocity) > mover.max_velocity:  
         mover.velocity = normalize(mover.velocity)
         mover.velocity = mover.velocity * mover.max_velocity
     mover.linear = steering.linear
@@ -238,7 +244,7 @@ def steering_follow_path(mover, path):
     current_param = path.path_param(path, mover.position)
     if target_param > 1:
         target_param = 1
-    target_position = path_get_position(path, target_param)
+    target_position = path_position(path, target_param)
     target = target_position.position
     return steering_follow_path(mover, target)
     
@@ -257,7 +263,7 @@ def main():
         characters = [character1, character2, character3, character4]
         
     """instance of character object for assignment 2"""
-    elif ASSIGNMENT == 2:
+    if ASSIGNMENT == 2:
         delta_time = 0.50
         time_stop = 125
         """new character"""
@@ -265,9 +271,12 @@ def main():
                                max_velocity=4, max_linear=2, path_to_follow = 1, path_offset = 0.04)
         characters = [character5]
         
-    filename = 'CS330 Assignment ' + str(ASSIGNMENT) + ' output.txt'   """creates a file and writes in all trajectory data"""
-    f = open(filename, 'w') """creates file if one does not exist"""
-    for character in characters: """print time 0 initial conditions to console"""
+    """creates a file and writes in all trajectory data"""    
+    filename = 'CS330 Assignment ' + str(ASSIGNMENT) + ' output.txt' 
+    """creates file if one does not exist"""
+    f = open(filename, 'w')
+    """print time 0 initial conditions to console"""
+    for character in characters: 
         print(time, character.id, character.position[0], character.position[1], character.velocity[0],
         character.velocity[1], character.linear[0], character.linear[1], character.orientation, 
         character.steer, character.colCollided, sep = ", ", end = "\n", file=f)
@@ -283,12 +292,12 @@ def main():
                 steering = steering_continue(character)
             elif character.steer == SEEK: 
                 steering = steering_seek(character, character.target.position)
-            elif characters[i].steer == FLEE:
+            elif characters.steer == FLEE:
                     steering = steering_flee(character, character.target.position)
-            elif characters[i].steer == ARRIVE:
+            elif characters.steer == ARRIVE:
                     steering = steering_arrive(character, character.target.position)
-                    characters[i].linear = steering.linear
-            elif character[i].steer == FOLLOWPATH:
+                    characters.linear = steering.linear
+            elif character.steer == FOLLOWPATH:
                 if character.path_to_follow == 1:
                     Path = path()
                     x = (0, -20, 20, -40, 40, -60, 60, 0)
@@ -300,7 +309,8 @@ def main():
             character = update(character, steering, delta_time)
             
         """cycle through characters and print updated conditions"""
-        f = open(filename, 'a') """append to output file"""
+        """append to output file"""
+        f = open(filename, 'a') 
         for character in characters:
             print(time, character.id, character.position[0], character.position[1], character.velocity[0],
             character.velocity[1], character.linear[0], character.linear[1], character.orientation, 
