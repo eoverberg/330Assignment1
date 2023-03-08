@@ -232,7 +232,7 @@ def steering_follow_path(mover, path):
     result = steering_output()
     """calculate target to delegate to face"""
     """Find current position on the path"""
-    current_param = 
+    current_param = path.path_param(path, mover.position)
     
     
 
