@@ -8,6 +8,9 @@ Program: Assignment 2
 import math
 import numpy as np
 
+ASSIGNMENT = 2
+
+"""initialize steering behavior constraints"""
 CONTINUE = 1
 FLEE = 2
 SEEK = 3
@@ -239,66 +242,68 @@ def steering_follow_path(mover, path):
     target = target_position.position
     return steering_follow_path(mover, target)
     
-    
-
-
 def main():
-    character1 = character(id="2601", steer=CONTINUE)
-    character2 = character(id="2502", steer=FLEE, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 4,
-                           rotation=8, max_velocity=8,
-                           max_linear=2, target=1, max_acceleration=1.5)
-    character3 = character(id="2503", steer=SEEK, position=[-50, 40], velocity=[0, 8], orientation=3 * math.pi / 2,
-                           rotation=8,
-                           max_linear=2, max_velocity=8, target=1, max_acceleration=2)
-    character4 = character(id="2504", steer=ARRIVE, position=[50, 75], velocity=[-9, 4], orientation=math.pi,
-                           rotation=8,
-                           max_linear=2, max_velocity=10, max_acceleration=2, target=1, arrive_radius=4, arrive_slow=32)
+    if ASSIGNMENT == 1:
+        delta_time = 0.50
+        time_stop = 50
+        character1 = character(id="2601", steer=CONTINUE)
+        character2 = character(id="2502", steer=FLEE, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 4,
+                               rotation=8, max_velocity=8, max_linear=2, target=1, max_acceleration=1.5)
+        character3 = character(id="2503", steer=SEEK, position=[-50, 40], velocity=[0, 8], orientation=3 * math.pi / 2,
+                               rotation=8, max_linear=2, max_velocity=8, target=1, max_acceleration=2)
+        character4 = character(id="2504", steer=ARRIVE, position=[50, 75], velocity=[-9, 4], orientation=math.pi,
+                               rotation=8, max_linear=2, max_velocity=10, max_acceleration=2, target=1, arrive_radius=4, arrive_slow=32)
 
-    characters = [character1, character2, character3, character4]
-    time = 0
-    delta_time = 0.50
-    time_stop = 50
-    with open("trajectoryfile.txt", "w") as f:  """creates a file and writes in all trajectory data"""
-        while time <= time_stop:
-            for i in range(len(characters)):
-                if characters[i].steer == CONTINUE:
-                    steering = steering_continue(characters[i])
-                elif characters[i].steer == SEEK:
-                    steering = steering_seek(characters[i], character1)
+        characters = [character1, character2, character3, character4]
+        
+    """instance of character object for assignment 2"""
+    elif ASSIGNMENT == 2:
+        delta_time = 0.50
+        time_stop = 125
+        """new character"""
+        character5 = character(id="2701", steer=FOLLOWPATH, position=[20, 95], velocity=[0, 0], orientation=0,
+                               max_velocity=4, max_linear=2, path_to_follow = 1, path_offset = 0.04)
+        characters = [character5]
+        
+    filename = 'CS330 Assignment ' + str(ASSIGNMENT) + ' output.txt'   """creates a file and writes in all trajectory data"""
+    f = open(filename, 'w') """creates file if one does not exist"""
+    for character in characters: """print time 0 initial conditions to console"""
+        print(time, character.id, character.position[0], character.position[1], character.velocity[0],
+        character.velocity[1], character.linear[0], character.linear[1], character.orientation, 
+        character.steer, character.colCollided, sep = ", ", end = "\n", file=f)
+    f.close()
+    
+    """main while loop"""
+    while(time < time_stop):
+        time = time + delta_time
+        
+        """loop through all characters and execute relevant steering behavior"""
+        for character in characters:
+            if character.steer == CONTINUE:
+                steering = steering_continue(character)
+            elif character.steer == SEEK: 
+                steering = steering_seek(character, character.target.position)
+            elif characters[i].steer == FLEE:
+                    steering = steering_flee(character, character.target.position)
+            elif characters[i].steer == ARRIVE:
+                    steering = steering_arrive(character, character.target.position)
                     characters[i].linear = steering.linear
-                elif characters[i].steer == FLEE:
-                    steering = steering_flee(characters[i], character1)
-                    characters[i].linear = steering.linear
-                elif characters[i].steer == ARRIVE:
-                    steering = steering_arrive(characters[i], character1)
-                    characters[i].linear = steering.linear
-                elif character[i].steer == FOLLOWPATH:
-                    steering = steering_follow_path(character[i], character1)
-                characters[i] = dynamic_update(characters[i], steering, delta_time)
-                f.write(str(time))
-                f.write(",")
-                f.write(str(characters[i].id))
-                f.write(",")
-                f.write(str(characters[i].position[0]))
-                f.write(",")
-                f.write(str(characters[i].position[1]))
-                f.write(",")
-                f.write(str(characters[i].velocity[0]))
-                f.write(",")
-                f.write(str(characters[i].velocity[1]))
-                f.write(",")
-                f.write(str(characters[i].linear[0]))
-                f.write(",")
-                f.write(str(characters[i].linear[1]))
-                f.write(",")
-                f.write(str(characters[i].orientation))
-                f.write(",")
-                f.write(str(characters[i].steer))
-                f.write(",")
-                f.write("FALSE")
-                f.write("\n")
-            time = time + delta_time
-
-
-if __name__ == main():
-    main()
+            elif character[i].steer == FOLLOWPATH:
+                if character.path_to_follow == 1:
+                    Path = path()
+                    x = (0, -20, 20, -40, 40, -60, 60, 0)
+                    y = (90, 65, 40, 15, -10, -35, -60, -85)
+                    path.path_assemble(1, x, y)
+                steering = steering_follow_path(mover, path)
+                
+            """calculate updates"""
+            character = update(character, steering, delta_time)
+            
+        """cycle through characters and print updated conditions"""
+        f = open(filename, 'a') """append to output file"""
+        for character in characters:
+            print(time, character.id, character.position[0], character.position[1], character.velocity[0],
+            character.velocity[1], character.linear[0], character.linear[1], character.orientation, 
+            character.steer, character.colCollided, sep = ", ", end = "\n", file=f)
+        f.close()
+        
