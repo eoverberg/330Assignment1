@@ -103,6 +103,8 @@ for mov in movers:
         label = "Flee"
     elif (m.behavior == 4):
         label = "Arrive"
+    elif (m.behavior == 5):
+        label = "Follow Path"
 
     plt.annotate(label, color='red', xy=(m.x[0] + 2, m.z[0] - 2))
 
