@@ -28,7 +28,7 @@ def normalize(vector):
     return result
 
 """Calculate scalar dot product of two 2D vectors"""
-def vector_dot(A, B)
+def vector_dot(A, B):
     return np.sum(A * B)
 
 """calculate Euclidean distance between two points in 2D"""
@@ -38,13 +38,13 @@ def distance_point_point(P, Q):
                     
 """Find point on line closest to query point in 2D."""
 """Q is the query point, A and B are distinct points on the line, as vectors"""
-def closest_point_line(Q, A, B)
+def closest_point_line(Q, A, B):
     T = vector_dot((Q - A), (B - A)) / vector_dot((B - A), (B - A))
     return(A + (T * (B - A)))
 
 """FInd point on segment closest to query point in 2D."""
 """Q is the query point, A and B are endpoints of the segment, as vectors."""
-def closest_point_segment(Q, A, B)
+def closest_point_segment(Q, A, B):
     T = vector_dot((Q - A), (B - A)) / vector_dot((B - A), (B - A))
     if T <= 0:
         return A
@@ -69,11 +69,11 @@ def path_position(path, param):
     """Find segment S on path H with endpoints A and B"""
     A = np.array([path.x[i], path.y[i]])
     B = np.array([path.x[i + 1], path.y[i + 1]])
-    T = (param - path.param[i]) / path.param[i + 1] - path.param[i])
+    T = (param - path.param[i]) / (path.param[i + 1] - path.param[i])
     P = A + T * (B - A)
     return P
 
-def path_param(path, position)
+def path_param(path, position):
     """Find point on path closest to given position"""
     closest_distance = np.inf
     for i in range(1, path.segments):
@@ -233,6 +233,11 @@ def steering_follow_path(mover, path):
     """calculate target to delegate to face"""
     """Find current position on the path"""
     current_param = path.path_param(path, mover.position)
+    if target_param > 1:
+        target_param = 1
+    target_position = path_get_position(path, target_param)
+    target = target_position.position
+    return steering_follow_path(mover, target)
     
     
 
