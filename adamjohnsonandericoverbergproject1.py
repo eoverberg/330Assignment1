@@ -306,7 +306,7 @@ def main():
                 steering = steering_follow_path(mover, path)
                 
             """calculate updates"""
-            character = update(character, steering, delta_time)
+            character = dynamic_update(character, steering, delta_time)
             
         """cycle through characters and print updated conditions"""
         """append to output file"""
