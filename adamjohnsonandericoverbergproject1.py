@@ -12,21 +12,22 @@ ASSIGNMENT = 2
 
 """initialize steering behavior constraints"""
 CONTINUE = 1
-FLEE = 2
-SEEK = 3
-ARRIVE = 4
-FOLLOWPATH = 5
+FLEE = 6
+SEEK = 7
+ARRIVE = 8
+FOLLOWPATH = 11
 
 
 """calculate length of 2D vector"""
 def length(vector):
-    return math.sqrt(vector[0] ** 2 + vector[1] ** 2)
+    length = math.sqrt(vector[0]*vector[0] + vector[1]*vector[1])
+    return length
 
 """normalize vector (keep direction but make the length = 1"""
 def normalize(vector):
     vector_length = length(vector)
     if vector_length == 0:
-        return vector
+               return vector
     result = np.array([vector[0] / vector_length, vector[1] / vector_length])
     return result
 
@@ -210,7 +211,7 @@ def steering_arrive(mover, target):
     result.linear[0] = result.linear[0] / mover.arrive_time
     result.linear[1] = result.linear[1] / mover.arrive_time
     """resets the vector"""
-    if vector_length(result.linear) > mover.max_linear:  
+    if length(result.linear) > mover.max_linear:  
         result.linear = normalize(result.linear)
         result.linear = result.linear * mover.max_linear
     result.angular = 0
@@ -303,7 +304,7 @@ def main():
                     x = (0, -20, 20, -40, 40, -60, 60, 0)
                     y = (90, 65, 40, 15, -10, -35, -60, -85)
                     path.path_assemble(1, x, y)
-                steering = steering_follow_path(mover, path)
+                steering = steering_follow_path(character, path)
                 
             """calculate updates"""
             character = dynamic_update(character, steering, delta_time)
