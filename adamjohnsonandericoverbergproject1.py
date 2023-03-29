@@ -162,7 +162,7 @@ class character(object):
 class path(object):
     """initialize array for path"""
 
-    def __init___(self, id: int = 0, x: np.array = ([0, 0]), y: np.array = ([0, 0]), params: np.array = ([0, 0]),
+    def __init___(self, id: str = None, x: np.array = ([0, 0]), y: np.array = ([0, 0]), params: np.array = ([0, 0]),
                   distance: np.array = ([0, 0]), segments: int = 0):
         self.id = id
         """Array of x coordinates"""
