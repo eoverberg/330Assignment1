@@ -358,5 +358,5 @@ def main():
                   character.velocity[1], character.linear[0], character.linear[1], character.orientation,
                   character.steer, character.colCollided, sep=", ", end="\n", file=f)
         f.close()
-if __name__ main():
+if __name__ == main():
     main()
