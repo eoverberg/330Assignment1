@@ -16,7 +16,7 @@ import csv
 import math
 
 # Change this to data file name
-filename = "CS 330, Dynamic trajectory data.txt"
+filename = "output.txt"
 
 # Create Path Following Path 
 path_follow = True
