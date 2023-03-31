@@ -82,7 +82,8 @@ def path_assemble(path_id, path_x, path_y):
         path_distance[i] = path_distance[i - 1] + distance_point_point([path_x[i - 1], path_y[i - 1]],
                                                                        [path_x[i], path_y[i]])
     path_param = np.zeros(path_segments + 1)
-    path_param[i] = path_distance[i] / max(path_distance)
+    for i in range(1, path_segments + 1):
+        path_param[i] = path_distance[i] / max(path_distance)
     return path_id, path_x, path_y, path_distance, path_param, path_segments
 
 
@@ -90,6 +91,8 @@ def path_assemble(path_id, path_x, path_y):
 
 
 def path_position(path, param):
+    if param <= path.param[0]:
+        return np.array([path.x[0], path.y[0]])
     i = max(np.where(param > path.param)[0])
     """Find segment S on path H with endpoints A and B"""
     A = np.array([path.x[i], path.y[i]])
@@ -127,11 +130,11 @@ class steering_output(object):
 """class to create character instances"""
 
 
-class character(object):
+class Character:
     """Initialize general movement"""
 
-    def __init__(self, id: str = None, steer: int = 0, position: np.array = ([0, 0]), velocity: np.array = ([0, 0]),
-                 linear: np.array = ([0, 0]), orientation: float = 0, rotation: float = 0, angular: float = 0,
+    def __init__(self, id: str = None, steer: int = 0, position: np.array = np.array([0, 0]), velocity: np.array = np.array([0, 0]),
+                 linear: np.array = np.array([0, 0]), orientation: float = 0, rotation: float = 0, angular: float = 0,
                  max_velocity: float = 0,
                  max_linear: float = 0, target: int = 0, target_radius: int = 0, arrive_radius: float = 0,
                  arrive_slow: float = 0,
@@ -162,8 +165,8 @@ class character(object):
 class path(object):
     """initialize array for path"""
 
-    def __init___(self, id: str = None, x: np.array = ([0, 0]), y: np.array = ([0, 0]), params: np.array = ([0, 0]),
-                  distance: np.array = ([0, 0]), segments: int = 0):
+    def __init___(self, id: str = None, x: np.array = np.array([0, 0]), y: np.array = np.array([0, 0]), params: np.array = np.array([0, 0]),
+                  distance: np.array = np.array([0, 0]), segments: int = 0):
         self.id = id
         """Array of x coordinates"""
         self.x = x
@@ -290,28 +293,29 @@ def steering_follow_path(mover, path):
 
 
 def main():
-    if ASSIGNMENT == 1:
-        delta_time = 0.50
-        time_stop = 50
-        character1 = character(id="2601", steer=CONTINUE)
-        character2 = character(id="2502", steer=FLEE, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 4,
-                               rotation=8, max_velocity=8, max_linear=2, target=1, max_acceleration=1.5)
-        character3 = character(id="2503", steer=SEEK, position=[-50, 40], velocity=[0, 8], orientation=3 * math.pi / 2,
-                               rotation=8, max_linear=2, max_velocity=8, target=1, max_acceleration=2)
-        character4 = character(id="2504", steer=ARRIVE, position=[50, 75], velocity=[-9, 4], orientation=math.pi,
-                               rotation=8, max_linear=2, max_velocity=10, max_acceleration=2, target=1, arrive_radius=4,
-                               arrive_slow=32)
-
-        characters = [character1, character2, character3, character4]
+    time = 0.0
+    # if ASSIGNMENT == 1:
+    #     delta_time = 0.50
+    #     time_stop = 50
+    #     character1 = Character(id="2601", steer=CONTINUE)
+    #     character2 = Character(id="2502", steer=FLEE, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 4,
+    #                            rotation=8, max_velocity=8, max_linear=2, target=1, max_acceleration=1.5)
+    #     character3 = Character(id="2503", steer=SEEK, position=[-50, 40], velocity=[0, 8], orientation=3 * math.pi / 2,
+    #                            rotation=8, max_linear=2, max_velocity=8, target=1, max_acceleration=2)
+    #     character4 = Character(id="2504", steer=ARRIVE, position=[50, 75], velocity=[-9, 4], orientation=math.pi,
+    #                            rotation=8, max_linear=2, max_velocity=10, max_acceleration=2, target=1, arrive_radius=4,
+    #                            arrive_slow=32)
+    #
+    #     characters = [character1, character2, character3, character4]
 
     """instance of character object for assignment 2"""
-    if ASSIGNMENT == 2:
-        delta_time = 0.50
-        time_stop = 125
-        """new character"""
-        character5 = character(id="2701", steer=FOLLOWPATH, position=[20, 95], velocity=[0, 0], orientation=0,
-                               max_velocity=4, max_linear=2, path_to_follow=1, path_offset=0.04)
-        characters = [character5]
+    #if ASSIGNMENT == 2:
+    delta_time = 0.50
+    time_stop = 125
+    """new character"""
+    character5 = Character(id="2701", steer=FOLLOWPATH, position=[20, 95], velocity=[0, 0], orientation=0,
+                            max_velocity=4, max_linear=2, path_to_follow=1, path_offset=0.04)
+    characters = [character5]
 
     """creates a file and writes in all trajectory data"""
     filename = 'CS330 Assignment ' + str(ASSIGNMENT) + ' output.txt'
