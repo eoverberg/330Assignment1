@@ -45,69 +45,123 @@ def vector_dot(A, B):
 """calculate Euclidean distance between two points in 2D"""
 
 
-def distance_point_point(P, Q):
-    return np.sqrt((P[0] - Q[0]) ** 2 + (P[1] - Q[1]) ** 2)
+def distance_point_point(point_a, point_b):
+    return math.sqrt(sum([(point_a[i] - point_b[i]) ** 2 for i in range(2)]))  #
 
 
-"""Find point on line closest to query point in 2D."""
-"""Q is the query point, A and B are distinct points on the line, as vectors"""
+#
+# """Find point on line closest to query point in 2D."""
+# """Q is the query point, A and B are distinct points on the line, as vectors"""
+#
+#
+# def closest_point_line(Q, A, B):
+#     T = vector_dot((Q - A), (B - A)) / vector_dot((B - A), (B - A))
+#     return (A + (T * (B - A)))
+#
+#
+# """FInd point on segment closest to query point in 2D."""
+# """Q is the query point, A and B are endpoints of the segment, as vectors."""
+#
+#
+# def closest_point_segment(Q, A, B):
+#     T = vector_dot((Q - A), (B - A)) / vector_dot((B - A), (B - A))
+#     if T <= 0:
+#         return A
+#     elif T >= 1:
+#         return B
+#     else:
+#         return A + (T * (B - A))
+#
+#
+# """Assemble a complete path data structure from its coordinates"""
+#
+#
+# def path_assemble(path_id, path_x, path_y):
+#     path_segments = len(path_x) - 1
+#     path_distance = np.zeros(path_segments + 1)
+#     for i in range(1, path_segments + 1):
+#         path_distance[i] = path_distance[i - 1] + distance_point_point([path_x[i - 1], path_y[i - 1]],
+#                                                                        [path_x[i], path_y[i]])
+#     path_param = np.zeros(path_segments + 1)
+#     for i in range(1, path_segments + 1):
+#         path_param[i] = path_distance[i] / max(path_distance)
+#     return path_id, path_x, path_y, path_distance, path_param, path_segments
+#
+#
+# """Caclulate position on path"""
+#
+#
+# def path_position(path, param):
+#     if param <= path.param[0]:
+#         return np.array([path.x[0], path.y[0]])
+#     i = max(np.where(param > path.param)[0])
+#     """Find segment S on path H with endpoints A and B"""
+#     A = np.array([path.x[i], path.y[i]])
+#     B = np.array([path.x[i + 1], path.y[i + 1]])
+#     T = (param - path.param[i]) / (path.param[i + 1] - path.param[i])
+#     P = A + T * (B - A)
+#     return P
+#
+#
+# def path_param(path, position):
+#     """Find point on path closest to given position"""
+#     closest_distance = np.inf
+#     for i in range(1, path.segments):
+#         A = np.array([path.x[i - 1], path.y[i - 1]])
+#         B = np.array([path.x[i], path.y[i]])
+#         check_point = closest_point_segment(position, A, B)
+#         check_distance = distance_point_point(position, check_point)
+#         if check_distance < closest_distance:
+#             closest_point = check_point
+#             closest_distance = check_distance
+#             closest_segment = i
+#
+#     return closest_segment
+#
 
-
-def closest_point_line(Q, A, B):
-    T = vector_dot((Q - A), (B - A)) / vector_dot((B - A), (B - A))
-    return (A + (T * (B - A)))
-
-
-"""FInd point on segment closest to query point in 2D."""
-"""Q is the query point, A and B are endpoints of the segment, as vectors."""
-
-
+# Path functions
 def closest_point_segment(Q, A, B):
-    T = vector_dot((Q - A), (B - A)) / vector_dot((B - A), (B - A))
+    T = np.dot((Q - A), (B - A)) / np.dot((B - A), (B - A))
     if T <= 0:
         return A
     elif T >= 1:
         return B
     else:
-        return A + (T * (B - A))
+        return A + T * (B - A)
 
 
-"""Assemble a complete path data structure from its coordinates"""
-
-
-def path_assemble(path_id, path_x, path_y):
+# Assemble a complete path data structure from its coordinates.
+def assemble_path(path_id, path_x, path_y):
     path_segments = len(path_x) - 1
-    path_distance = np.zeros(path_segments + 1)
+    path_distance = [0] * (path_segments + 1)
     for i in range(1, path_segments + 1):
         path_distance[i] = path_distance[i - 1] + distance_point_point([path_x[i - 1], path_y[i - 1]],
                                                                        [path_x[i], path_y[i]])
-    path_param = np.zeros(path_segments + 1)
+    path_param = [0] * (path_segments + 1)
     for i in range(1, path_segments + 1):
         path_param[i] = path_distance[i] / max(path_distance)
-    return path_id, path_x, path_y, path_distance, path_param, path_segments
+    return {"id": path_id, "x": path_x, "y": path_y, "distance": path_distance, "param": path_param,
+            "segments": path_segments}
 
 
-"""Caclulate position on path"""
-
-
-def path_position(path, param):
-    if param <= path.param[0]:
-        return np.array([path.x[0], path.y[0]])
-    i = max(np.where(param > path.param)[0])
-    """Find segment S on path H with endpoints A and B"""
-    A = np.array([path.x[i], path.y[i]])
-    B = np.array([path.x[i + 1], path.y[i + 1]])
-    T = (param - path.param[i]) / (path.param[i + 1] - path.param[i])
-    P = A + T * (B - A)
+# Calculate the position on a path corresponding to a given path parameter.
+def get_path_position(path, param):
+    i = max([j for j in range(len(path["param"])) if param > path["param"][j]])
+    A = [path["x"][i], path["y"][i]]
+    B = [path["x"][i + 1], path["y"][i + 1]]
+    T = (param - path["param"][i]) / (path["param"][i + 1] - path["param"][i])
+    P = [A[k] + (T * (B[k] - A[k])) for k in range(2)]
     return P
 
 
-def path_param(path, position):
-    """Find point on path closest to given position"""
-    closest_distance = np.inf
+# Find the path parameter of the point on the path closest to a given position.
+def get_path_param(path, position):
+    # Find point on path closest to given position.
+
+    closest_distance = math.inf
     for i in range(1, path.segments):
-        A = np.array([path.x[i - 1], path.y[i - 1]])
-        B = np.array([path.x[i], path.y[i]])
+        A = [path["x"][i], path["y"][i]]
+        B = [path["x"][i + 1], path["y"][i + 1]]
         check_point = closest_point_segment(position, A, B)
         check_distance = distance_point_point(position, check_point)
         if check_distance < closest_distance:
@@ -115,7 +169,17 @@ def path_param(path, position):
             closest_distance = check_distance
             closest_segment = i
 
-    return closest_segment
+    # Calculate path parameter of closest point; see. p. 70.136.
+
+    A = [path["x"][closest_segment], path["y"][closest_segment]]
+    A_param = path["param"][closest_segment]
+    B = [path["x"][closest_segment + 1], path["y"][closest_segment + 1]]
+    B_param = path["param"][closest_segment + 1]
+    C = closest_point
+    T = length([C[k] - A[k] for k in range(2)]) / length([B[k] - A[k] for k in range(2)])
+    C_param = A_param + (T * (B_param - A_param))
+
+    return C_param
 
 
 """class for steering output of characters"""
@@ -133,12 +197,14 @@ class steering_output(object):
 class Character:
     """Initialize general movement"""
 
-    def __init__(self, id: str = None, steer: int = 0, position: np.array = np.array([0, 0]), velocity: np.array = np.array([0, 0]),
+    def __init__(self, id: str = None, steer: int = 0, position: np.array = np.array([0, 0]),
+                 velocity: np.array = np.array([0, 0]),
                  linear: np.array = np.array([0, 0]), orientation: float = 0, rotation: float = 0, angular: float = 0,
                  max_velocity: float = 0,
                  max_linear: float = 0, target: int = 0, target_radius: int = 0, arrive_radius: float = 0,
                  arrive_slow: float = 0,
                  arrive_time: float = 1, max_acceleration: float = 0, path_to_follow: int = 0, path_offset: float = 0):
+        self.colCollided = None
         self.id = id
         self.steer = steer
         self.position = position
@@ -165,7 +231,8 @@ class Character:
 class path(object):
     """initialize array for path"""
 
-    def __init___(self, id: str = None, x: np.array = np.array([0, 0]), y: np.array = np.array([0, 0]), params: np.array = np.array([0, 0]),
+    def __init___(self, id: str = None, x: np.array = np.array([0, 0]), y: np.array = np.array([0, 0]),
+                  params: np.array = np.array([0, 0]),
                   distance: np.array = np.array([0, 0]), segments: int = 0):
         self.id = id
         """Array of x coordinates"""
@@ -281,15 +348,11 @@ def dynamic_update(mover, steering, time):
 
 
 def steering_follow_path(mover, path):
-    result = steering_output()
-    """calculate target to delegate to face"""
-    """Find current position on the path"""
-    current_param = path.path_param(path, mover.position)
-    if target_param > 1:
-        target_param = 1
-    target_position = path_position(path, target_param)
-    target = target_position.position
-    return steering_follow_path(mover, target)
+    current_param = get_path_param(path, mover.position)
+    target_param = min(1, current_param + mover.path_offset)
+    target_position = path.get_position(path, target_param)
+    target = {"position": target_position}
+    return steering_seek(mover, target)
 
 
 def main():
@@ -309,12 +372,12 @@ def main():
     #     characters = [character1, character2, character3, character4]
 
     """instance of character object for assignment 2"""
-    #if ASSIGNMENT == 2:
+    # if ASSIGNMENT == 2:
     delta_time = 0.50
     time_stop = 125
     """new character"""
     character5 = Character(id="2701", steer=FOLLOWPATH, position=[20, 95], velocity=[0, 0], orientation=0,
-                            max_velocity=4, max_linear=2, path_to_follow=1, path_offset=0.04)
+                           max_velocity=4, max_linear=2, path_to_follow=1, path_offset=0.04)
     characters = [character5]
 
     """creates a file and writes in all trajectory data"""
@@ -329,7 +392,7 @@ def main():
     f.close()
 
     """main while loop"""
-    while (time < time_stop):
+    while time < time_stop:
         time = time + delta_time
 
         """loop through all characters and execute relevant steering behavior"""
@@ -338,9 +401,9 @@ def main():
                 steering = steering_continue(character)
             elif character.steer == SEEK:
                 steering = steering_seek(character, character.target.position)
-            elif characters.steer == FLEE:
+            elif character.steer == FLEE:
                 steering = steering_flee(character, character.target.position)
-            elif characters.steer == ARRIVE:
+            elif character.steer == ARRIVE:
                 steering = steering_arrive(character, character.target.position)
                 characters.linear = steering.linear
             elif character.steer == FOLLOWPATH:
@@ -348,7 +411,7 @@ def main():
                     Path = path()
                     x = (0, -20, 20, -40, 40, -60, 60, 0)
                     y = (90, 65, 40, 15, -10, -35, -60, -85)
-                    path.path_assemble(1, x, y)
+                    assemble_path(1, x, y)
                 steering = steering_follow_path(character, path)
 
             """calculate updates"""
@@ -362,5 +425,7 @@ def main():
                   character.velocity[1], character.linear[0], character.linear[1], character.orientation,
                   character.steer, character.colCollided, sep=", ", end="\n", file=f)
         f.close()
+
+
 if __name__ == main():
     main()
