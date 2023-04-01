@@ -228,7 +228,7 @@ class Character:
 """class for path instances"""
 
 
-class path(object):
+class Path:
     """initialize array for path"""
 
     def __init___(self, id: str = None, x: np.array = np.array([0, 0]), y: np.array = np.array([0, 0]),
@@ -243,7 +243,7 @@ class path(object):
         self.params = params
         """Array of path distance at each vertex"""
         self.distance = distance
-        """Number of segemnts in the path"""
+        """Number of segments in the path"""
         self.segments = segments
 
 
@@ -408,7 +408,7 @@ def main():
                 characters.linear = steering.linear
             elif character.steer == FOLLOWPATH:
                 if character.path_to_follow == 1:
-                    Path = path()
+                    path = Path()
                     x = (0, -20, 20, -40, 40, -60, 60, 0)
                     y = (90, 65, 40, 15, -10, -35, -60, -85)
                     assemble_path(1, x, y)
