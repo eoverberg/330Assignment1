@@ -121,13 +121,20 @@ def distance_point_point(point_a, point_b):
 
 # Path functions
 def closest_point_segment(Q, A, B):
-    T = np.dot((Q - A), (B - A)) / np.dot((B - A), (B - A))
-    if T <= 0:
+    Q = np.array(Q)
+    A = np.array(A)
+    B = np.array(B)
+    BA = B - A
+    QA = Q - A
+    AB = A - B
+    QB = Q - B
+    t = max(0, min(1, np.dot(QA, BA) / np.dot(BA, BA)))
+    if t == 0:
         return A
-    elif T >= 1:
+    elif t == 1:
         return B
     else:
-        return A + T * (B - A)
+        return A + t * BA
 
 
 # Assemble a complete path data structure from its coordinates.
@@ -140,16 +147,21 @@ def assemble_path(path_id, path_x, path_y):
     path_param = [0] * (path_segments + 1)
     for i in range(1, path_segments + 1):
         path_param[i] = path_distance[i] / max(path_distance)
-    return {"id": path_id, "x": path_x, "y": path_y, "distance": path_distance, "param": path_param,
-            "segments": path_segments}
-
+    resultPath = Path()
+    resultPath.id = path_id
+    resultPath.x = path_x
+    resultPath.y = path_y
+    resultPath.distance = path_distance
+    resultPath.params = path_param
+    resultPath.segments = path_segments
+    return resultPath
 
 # Calculate the position on a path corresponding to a given path parameter.
 def get_path_position(path, param):
-    i = max([j for j in range(len(path["param"])) if param > path["param"][j]])
-    A = [path["x"][i], path["y"][i]]
-    B = [path["x"][i + 1], path["y"][i + 1]]
-    T = (param - path["param"][i]) / (path["param"][i + 1] - path["param"][i])
+    i = max([j for j in range(len(path.params)) if param > path.params[j]])
+    A = [path.x[i], path.y[i]]
+    B = [path.x[i + 1], path.y[i + 1]]
+    T = (param - path.params[i]) / (path.params[i + 1] - path.params[i])
     P = [A[k] + (T * (B[k] - A[k])) for k in range(2)]
     return P
 
@@ -160,8 +172,8 @@ def get_path_param(path, position):
 
     closest_distance = math.inf
     for i in range(1, path.segments):
-        A = [path["x"][i], path["y"][i]]
-        B = [path["x"][i + 1], path["y"][i + 1]]
+        A = [path.x[i], path.y[i]]
+        B = [path.x[i + 1], path.y[i + 1]]
         check_point = closest_point_segment(position, A, B)
         check_distance = distance_point_point(position, check_point)
         if check_distance < closest_distance:
@@ -171,10 +183,10 @@ def get_path_param(path, position):
 
     # Calculate path parameter of closest point; see. p. 70.136.
 
-    A = [path["x"][closest_segment], path["y"][closest_segment]]
-    A_param = path["param"][closest_segment]
-    B = [path["x"][closest_segment + 1], path["y"][closest_segment + 1]]
-    B_param = path["param"][closest_segment + 1]
+    A = [path.x[closest_segment], path.y[closest_segment]]
+    A_param = path.params[closest_segment]
+    B = [path.x[closest_segment + 1], path.y[closest_segment + 1]]
+    B_param = path.params[closest_segment + 1]
     C = closest_point
     T = length([C[k] - A[k] for k in range(2)]) / length([B[k] - A[k] for k in range(2)])
     C_param = A_param + (T * (B_param - A_param))
@@ -348,28 +360,31 @@ def dynamic_update(mover, steering, time):
 
 
 def steering_follow_path(mover, path):
+    target = Character()
     current_param = get_path_param(path, mover.position)
     target_param = min(1, current_param + mover.path_offset)
-    target_position = path.get_position(path, target_param)
-    target = {"position": target_position}
+    target_position = get_path_position(path, target_param)
+    target.position[0] = target_position[0]
+    target.position[1] = target_position[1]
+    # target = {"position": target_position}
     return steering_seek(mover, target)
 
 
 def main():
     time = 0.0
-    # if ASSIGNMENT == 1:
-    #     delta_time = 0.50
-    #     time_stop = 50
-    #     character1 = Character(id="2601", steer=CONTINUE)
-    #     character2 = Character(id="2502", steer=FLEE, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 4,
-    #                            rotation=8, max_velocity=8, max_linear=2, target=1, max_acceleration=1.5)
-    #     character3 = Character(id="2503", steer=SEEK, position=[-50, 40], velocity=[0, 8], orientation=3 * math.pi / 2,
-    #                            rotation=8, max_linear=2, max_velocity=8, target=1, max_acceleration=2)
-    #     character4 = Character(id="2504", steer=ARRIVE, position=[50, 75], velocity=[-9, 4], orientation=math.pi,
-    #                            rotation=8, max_linear=2, max_velocity=10, max_acceleration=2, target=1, arrive_radius=4,
-    #                            arrive_slow=32)
-    #
-    #     characters = [character1, character2, character3, character4]
+    if ASSIGNMENT == 1:
+        delta_time = 0.50
+        time_stop = 50
+        character1 = Character(id="2601", steer=CONTINUE)
+        character2 = Character(id="2502", steer=FLEE, position=[-30, -50], velocity=[2, 7], orientation=math.pi / 4,
+                               rotation=8, max_velocity=8, max_linear=2, target=1, max_acceleration=1.5)
+        character3 = Character(id="2503", steer=SEEK, position=[-50, 40], velocity=[0, 8], orientation=3 * math.pi / 2,
+                               rotation=8, max_linear=2, max_velocity=8, target=1, max_acceleration=2)
+        character4 = Character(id="2504", steer=ARRIVE, position=[50, 75], velocity=[-9, 4], orientation=math.pi,
+                               rotation=8, max_linear=2, max_velocity=10, max_acceleration=2, target=1, arrive_radius=4,
+                               arrive_slow=32)
+
+        characters = [character1, character2, character3, character4]
 
     """instance of character object for assignment 2"""
     # if ASSIGNMENT == 2:
@@ -408,10 +423,9 @@ def main():
                 characters.linear = steering.linear
             elif character.steer == FOLLOWPATH:
                 if character.path_to_follow == 1:
-                    path = Path()
                     x = (0, -20, 20, -40, 40, -60, 60, 0)
                     y = (90, 65, 40, 15, -10, -35, -60, -85)
-                    assemble_path(1, x, y)
+                    path = assemble_path(1, x, y)
                 steering = steering_follow_path(character, path)
 
             """calculate updates"""
@@ -425,7 +439,6 @@ def main():
                   character.velocity[1], character.linear[0], character.linear[1], character.orientation,
                   character.steer, character.colCollided, sep=", ", end="\n", file=f)
         f.close()
-
 
 if __name__ == main():
     main()
