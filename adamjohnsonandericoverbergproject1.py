@@ -169,9 +169,9 @@ def get_path_position(path, param):
 # Find the path parameter of the point on the path closest to a given position.
 def get_path_param(path, position):
     # Find point on path closest to given position.
-
+    closest_segment = 0
     closest_distance = math.inf
-    for i in range(1, path.segments):
+    for i in range(0, path.segments):
         A = [path.x[i], path.y[i]]
         B = [path.x[i + 1], path.y[i + 1]]
         check_point = closest_point_segment(position, A, B)
